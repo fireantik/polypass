@@ -1,5 +1,4 @@
 "use strict";
-var request = require('request');
 var Block = require('./BlockManager.js');
 var Crypto = require('./crypto.js');
 var rp = require('request-promise');
