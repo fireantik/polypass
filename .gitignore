@@ -32,3 +32,4 @@ node_modules
 #Custom
 .c9
 .idea
+db.sqlite
