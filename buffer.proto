@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+message BlockInfo {
+  required uint32 id = 1;
+  required bytes iv = 2;
+  required bytes tag = 3;
+  required uint32 length = 4;
+}
+
+message MainInfo {
+  required bytes salt = 1;
+  repeated BlockInfo blocks = 2;
+}
