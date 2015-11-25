@@ -59,10 +59,10 @@ function authorize(req, res, next){
     catch(ex) {
         return res.status(500).end('Error while decoding JWT');
     }
-
-    if(!decoded.uid) return res.status(400).end('UID missing');
-    if(!decoded.data) return res.status(400).end('Data missing');
-    if(!decoded.expires) return res.status(400).end('Expiration date missing');
+    console.log(decoded);
+    if(!Number.isInteger(decoded.uid)) return res.status(400).end('UID missing or invalid');
+    if(typeof decoded.data != "object") return res.status(400).end('Data missing or invalid');
+    if(!Number.isInteger(decoded.expires)) return res.status(400).end('Expiration date missing or invalid');
 
     db.User.findById(decoded.uid).then(function(user){
         if(!user) return res.status(400).end('Unknown user');
@@ -73,6 +73,8 @@ function authorize(req, res, next){
             req.jwt.uid = d.uid;
             next();
         });
+    }).catch(function(ex){
+        return res.status(400).end(ex.message);
     });
 }
 

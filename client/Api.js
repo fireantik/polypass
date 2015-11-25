@@ -1,5 +1,5 @@
-"use strict";
-/*var Block = require('./Block.js');
+'use strict';
+var Block = require('./Block.js');
 var Crypto = require('./../common/Crypto.js');
 var rp = require('request-promise');
 var jwt = require('jsonwebtoken');
@@ -56,7 +56,7 @@ function putBlock(uid, bid, block, cert){
     return block.getRaw().then(function(r){
         raw = r;
         var checkSum = Crypto.checkSum(raw);
-        
+
         return jwtSign(uid, cert, {bid: bid, checksum: checkSum.toString('hex')});
     }).then(function(jwt){
         return rp({
@@ -90,55 +90,57 @@ function getInfo(username){
     });
 }
 
-var keys = genKey();
-var crypto, info;
-Crypto("is da boss").then(function(c){
-    crypto = c;
-    return register("fireant", crypto, keys);
-}).then(function(data) {
-    console.log("register data:", data);
-    return getInfo("fireant");
-}).catch(function(err){
-    console.log(err);
-    return getInfo("fireant");
-}).then(function(i){
-    info = i;
-    console.log("info", info);
-    return Crypto("is da boss", new Buffer(info.salt, 'hex'));
-}).then(function(cr){
-    crypto = cr;
-    return decryptPriv(crypto, info.priv);
-}).then(function(priv){
-    keys = {pub: info.pub, priv: priv};
-    console.log(keys);
-    var block = new Block(crypto);
-    block.setLean(new Buffer("fireant is da boss"));
-    return putBlock(info.uid, 0, block, keys.priv);
-}).then(function(data){
-    console.log("put block:", data);
-    return readBlock(info.uid, 0, keys.priv);
-}).then(function(data){
-    var block = new Block(crypto);
-    block.setRaw(data);
-    return block.getLean();
-}).then(function(data){
-    console.log("get block:", data.toString('utf-8'));
-})
-.catch(function (err){
-    throw err;
-});
-*/
+export class Api {
+    constructor(username, obj){
+        var self = this;
 
-import {Api} from './Api.js';
+        this.username = username;
 
-function intitialized(api){
-    api.writeBlock(0, new Buffer('fireant is da boss')).then(()=>api.getBlock(0)).then(data=>{
-       console.log(data.toString('utf-8'));
-    });
+        getInfo(username).then(function(info){
+            function tryPw(){
+                return obj.getPassword().then(function(pw){
+                    return Crypto(pw, new Buffer(info.salt, 'hex'));
+                }).then(function(crypto){
+                    self.crypto = crypto;
+                    return decryptPriv(crypto, info.priv);
+                }).then(function(priv){
+                    self.keys = {pub: info.pub, priv: priv};
+                    self.uid = info.uid;
+                    obj.initialized();
+                }).catch(function(err){
+                    console.log(err);
+                    throw err;
+                    //return tryPw();
+                });
+            }
+
+            return tryPw();
+        }).catch(function(err){
+            if(err.error == "Username not found") return obj.shouldRegister();
+            else throw err;
+        }).then(function(should){
+            if(should) {
+                return obj.getPassword().then(pw => Crypto(pw)).then(crypto => {
+                    self.crypto = crypto;
+                    self.keys = genKey();
+                    return register(username, crypto, self.keys).then(data=>self.uid = data.uid).then(obj.initialized);
+                });
+            }
+        })
+    }
+
+    getBlock(id){
+        var block = new Block(this.crypto);
+        return readBlock(this.uid, id, this.keys.priv).then(data=>{
+            block.setRaw(data);
+            return block.getLean();
+        });
+    }
+
+    writeBlock(id, data){
+        console.log(this.uid);
+        var block = new Block(this.crypto);
+        block.setLean(data);
+        return putBlock(this.uid, id, block, this.keys.priv);
+    }
 }
-
-var api = new Api("fireant", {
-    getPassword: () => Promise.resolve("fireant is da boss"),
-    initialized: () => intitialized(api),
-    shouldRegister: () => Promise.resolve(true)
-});
