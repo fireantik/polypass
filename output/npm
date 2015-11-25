@@ -1,0 +1,34 @@
+
+> polypass@0.0.1 start /windows/Projects/polypass4
+> node ./server/index.js
+
+App listening at http://0.0.0.0:3000
+db synced
+Executing (default): SELECT `uid`, `name`, `salt`, `pub`, `priv`, `lastAccess` FROM `Users` AS `User` LIMIT 1;
+Executing (f597f5f6-966b-408e-873d-effd881692e2): BEGIN TRANSACTION;
+Executing (f597f5f6-966b-408e-873d-effd881692e2): -- SQLite is not able to choose the isolation level REPEATABLE READ.
+Executing (f597f5f6-966b-408e-873d-effd881692e2): -- SQLite does not support SET autocommit.
+Executing (f597f5f6-966b-408e-873d-effd881692e2): SELECT `uid`, `name`, `salt`, `pub`, `priv`, `lastAccess` FROM `Users` AS `User` WHERE `User`.`name` = '6f6e01b64e95f355b8098f2dbe32420ebb44098ac75dfcecb39943e93f4fcb3b' LIMIT 1;
+Executing (f597f5f6-966b-408e-873d-effd881692e2): INSERT INTO `Users` (`uid`,`name`,`salt`,`pub`,`priv`,`lastAccess`) VALUES (NULL,'6f6e01b64e95f355b8098f2dbe32420ebb44098ac75dfcecb39943e93f4fcb3b','a9f021ddafbc0ca2','-----BEGIN RSA PUBLIC KEY-----
+MIGJAoGBAKXZqYMdg2KAGcf37O2mKX2f/f1e5BB5pGz/UfTjcPrb5/MCsBO2uWVE
+q1smFSy4qXtkZSKtIiFKqJo0ORPJoReGUlQrk4UcOS8BNIb5XG1h/rV7poFw8rEw
+TZppW/UUbrEx8hL2KYBA6TM89ujzRIfZgweP7/54Pj/VY8VMpCnNAgMBAAE=
+-----END RSA PUBLIC KEY-----','P4LEjLGoXbzHbvOghwn/TJsJKdXhT+/e22SMcyIcp5I2AHjYS5KCP11cXHRkPDygsBDFNGlJaI01r2b37x6rDfpe+13UoZKbNkxDTQ6TejHGsTFG/kD/1yuxmmjzrvJZWGdBeohlwUGyDf3OGyIZSvwYHf4hLP71AardgQL7+SQJuUl3Mwe5a1GY/3HAaOKDVBZMZ0xEcRZR6dyv/jNCRtYiLaRDeou1T8bJO/3JoDJ4xUOHgflzciqKDv6l6hxCW4rSNIWVvmiLQSGtueNc/zzBWqh9fXr6HIyn+kMchOyFTslRTE6NZGrdqFL5vZP/5zDkN7O9RlerUW8lwry6i1D/g4LroerRtrduEu0kDi3JPmaguZl98ixZrAAB90yHTnnS7nFwySQ+p7UEti1fHFZlf9xmPDBw9p6bU6cnkCt+S0U4bEGUOX71/hz4wS5o6/Q7D2TH48sbOS8xholxTfEZKt2ybau1/CIeiDIDyv3LPj1axBV8RYb7dEOmA/GKsuuiEgam2VJ84mB+m7YyfK3EE3jGZBL+Q2/CDH3ucEjk+9NRgAHFdSwz4gGb92EKZ7uAj6IyS4HsDpX2UolAiacUCcPCAgBmnShwoiKnpxwECrJh/Jti1tmV+H/+oVRdMPbH4TuoWeZtzMrKnUeisQ23/tFTn8Cd5XcQ9bA1OsKLobEDReHQH+7xpoPJmg15KrBuUMUAeUNmrWSNmyabTo1m/zd5j5iS4O8s6Q+YuR2onvbAU0fSlZ1F6UlIRPgt1GMBpaPbFLek4HJ2xMjK2lQHknV0VS4ozO2mwk+5lEbRztx9kE1qLsVj3YOktiyT/DM3SN0mburQ4mxDUwo8sVHN+5V+q1oN3mnv/gaEJCLHaQZN3qsseelG9TdOcx4WK9crEsmx1iTq17+g4voe2FlFk7Okd6K5lVqP0yAfSeKFxsg6KJEf26rg5CHJB61GvqOz2jkT5XUcKmUm','2015-11-25 21:26:03.000 +00:00');
+Executing (f597f5f6-966b-408e-873d-effd881692e2): COMMIT;
+authorizing
+{ uid: 1,
+  data: 
+   { bid: 0,
+     checksum: '3ed8da3bb447bd034d664d900028c9768d5e413d72f7f0a1e885f0da0e6744e3' },
+  expires: 1448486823902,
+  iat: 1448486763 }
+Executing (default): SELECT `uid`, `name`, `salt`, `pub`, `priv`, `lastAccess` FROM `Users` AS `User` WHERE `User`.`uid` = 1;
+Executing (default): INSERT OR IGNORE INTO `Blocks` (`uid`,`bid`,`data`) VALUES (1,0,X'ec027ab06d65ec0fd70f1763c36090fa7b7c4ffa745d334906a53060cf899f8db0310d7a9e88063ffd262ff120ae6fb625d990bd08f9'); UPDATE `Blocks` SET `uid`=1,`bid`=0,`data`=X'ec027ab06d65ec0fd70f1763c36090fa7b7c4ffa745d334906a53060cf899f8db0310d7a9e88063ffd262ff120ae6fb625d990bd08f9' WHERE ((`uid` = 1 AND `bid` = 0))
+authorizing
+{ uid: 1,
+  data: { bid: 0 },
+  expires: 1448486824263,
+  iat: 1448486764 }
+Executing (default): SELECT `uid`, `name`, `salt`, `pub`, `priv`, `lastAccess` FROM `Users` AS `User` WHERE `User`.`uid` = 1;
+get
+Executing (default): SELECT `uid`, `bid`, `data` FROM `Blocks` AS `Block` WHERE `Block`.`uid` = 1 AND `Block`.`bid` = 0;

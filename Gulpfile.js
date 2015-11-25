@@ -1,7 +1,8 @@
+"use strict";
+
 var gulp = require('gulp');
 var less = require('gulp-less');
 var cssmin = require('gulp-cssmin');
-//var server = require('gulp-express');
 var sourcemaps = require('gulp-sourcemaps');
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
@@ -10,8 +11,11 @@ var watchify = require('watchify');
 var rename = require("gulp-rename");
 var uglify = require('gulp-uglify');
 var gulpif = require('gulp-if');
+var run = require('gulp-run');
+var spawn = require('child_process').spawn;
 
 var production = true;
+var server = null;
 
 function compile(src, watch) {
 	var opts = {
@@ -65,13 +69,27 @@ gulp.task('less', function () {
 
 gulp.task('build', ['less', 'app_js']);
 
-gulp.task('dev', function () {
-	production = false;
+gulp.task('server', function(){
+	function start(){
+		server = spawn('npm', ['start']);
+		server.stdout.on('data', function(data){console.log(data.toString('utf-8'))});
+		server.stderr.on('data', function(data){console.log(data.toString('utf-8'))});
+	}
 
-	//server.run(['./server/index.js']);
+	if(server){
+		server.kill('SIGKILL');
+		server.on('exit', setTimeout.bind(null, start, 3000));
+	}
+	else start();
+});
+
+gulp.task('dev',['server'], function () {
+	production = false;
 
 	compile('./client/app.jsx', true);
 
 	gulp.watch('style/**/*.less', ['less']);
-	//gulp.watch(['./server/**/*.js', './common/**/*.js'], [server.run]);
+	//gulp.watch(['./server/**/*.js', './common/**/*.js'], ['server']);
 });
+
+

@@ -1,5 +1,7 @@
 'use strict';
 
+console.log("starting server");
+
 var express = require('express');
 var db = require('./db.js');
 var bodyParser = require('body-parser');
@@ -59,7 +61,6 @@ function authorize(req, res, next){
     catch(ex) {
         return res.status(500).end('Error while decoding JWT');
     }
-    console.log(decoded);
     if(!Number.isInteger(decoded.uid)) return res.status(400).end('UID missing or invalid');
     if(typeof decoded.data != "object") return res.status(400).end('Data missing or invalid');
     if(!Number.isInteger(decoded.expires)) return res.status(400).end('Expiration date missing or invalid');
@@ -100,7 +101,6 @@ app.put('/block', authorize, function(req, res){
 });
 
 app.get('/block', authorize, function(req, res) {
-    console.log("get");
     if(typeof req.jwt.bid == "undefined") return res.status(400).end('Missing block id');
 
     db.Block.findOne({where: {uid: req.jwt.uid, bid: req.jwt.bid}}).then(function(block){
