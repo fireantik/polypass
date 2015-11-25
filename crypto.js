@@ -70,8 +70,7 @@ module.exports = function Crypto(password, inputSalt){
   var self = this;
   var info = {
     key: null,
-    salt: inputSalt || null,
-    validationHash: null
+    salt: inputSalt || null
   };
   
   
@@ -87,13 +86,8 @@ module.exports = function Crypto(password, inputSalt){
     return info.salt;
   }
 
-  function getValidationHash(){
-    return info.validationHash;
-  }
-  
   var out = {};
   Object.defineProperty(out, 'getSalt', {writable: false, value: getSalt});
-  Object.defineProperty(out, 'getValidationHash', {writable: false, value: getValidationHash});
   Object.defineProperty(out, 'encrypt', {writable: false, value: outerEncrypt});
   Object.defineProperty(out, 'decrypt', {writable: false, value: outerDecrypt});
   
@@ -102,7 +96,6 @@ module.exports = function Crypto(password, inputSalt){
   else prom = makeKey(password, info.salt);
   return prom.then(function(key){
     info.key = key;
-    info.validationHash = Crypto.quickHash(info.key);
     return out;
   });
 };

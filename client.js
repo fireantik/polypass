@@ -29,7 +29,8 @@ function jwtSign(uid, cert, data){
     return new Promise(function(resolve){
         return jwt.sign({
             uid: uid,
-            data: data
+            data: data,
+            expires: Date.now() + 60 * 1000
         }, cert, { algorithm: 'RS512'}, resolve);
     });
 }
@@ -56,17 +57,30 @@ function putBlock(uid, bid, block, cert){
         raw = r;
         var checkSum = Crypto.checkSum(raw);
         
-        return jwtSign(uid, cert, {bid: bid, checkSum: checkSum});
+        return jwtSign(uid, cert, {bid: bid, checksum: checkSum.toString('hex')});
     }).then(function(jwt){
         return rp({
             uri: location.origin + "/block",
             method: 'PUT',
-            body: raw.toString('base64'),
+            body: raw,
             headers: {
                 Authorization: jwt
             }
         })
     });
+}
+
+function readBlock(uid, bid, cert){
+    return jwtSign(uid, cert, {bid: bid}).then(function(jwt){
+        return rp({
+            uri: location.origin + "/block",
+            method: 'GET',
+            headers: {
+                Authorization: jwt
+            },
+            encoding: null
+        });
+    })
 }
 
 function getInfo(username){
@@ -101,7 +115,14 @@ Crypto("is da boss").then(function(c){
     block.setLean(new Buffer("fireant is da boss"));
     return putBlock(info.uid, 0, block, keys.priv);
 }).then(function(data){
-    console.log(data);
+    console.log("put block:", data);
+    return readBlock(info.uid, 0, keys.priv);
+}).then(function(data){
+    var block = new Block(crypto);
+    block.setRaw(data);
+    return block.getLean();
+}).then(function(data){
+    console.log("get block:", data.toString('utf-8'));
 })
 .catch(function (err){
     throw err;
