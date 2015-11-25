@@ -114,11 +114,16 @@ function quickHash(what, salt){
   return hash.digest();
 }
 
+function checkSum(what){
+  return quickHash(what);
+}
+
 Object.defineProperty(module.exports, 'saltLength', {writable: false, value: 8});
 Object.defineProperty(module.exports, 'quickHashLength', {writable: false, value: 32});
 Object.defineProperty(module.exports, 'quickHash', {writable: false, value: quickHash});
 Object.defineProperty(module.exports, 'ivLength', {writable: false, value: 12});
 Object.defineProperty(module.exports, 'tagLength', {writable: false, value: 16});
+Object.defineProperty(module.exports, 'checkSum', {writable: false, value: checkSum});
 
 
 /*crypto.randomBytes(65536, function(ex, buf) {

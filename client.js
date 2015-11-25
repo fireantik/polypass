@@ -25,13 +25,11 @@ function decryptPriv(crypto, string){
     return block.getLean().then(function(raw){return raw.toString('utf-8')});
 }
 
-function jwtSign(uname, priv, pub, salt, cert){
+function jwtSign(uid, cert, data){
     return new Promise(function(resolve){
-        jwt.sign({
-            username: uname,
-            pub: pub,
-            priv: priv,
-            salt: salt
+        return jwt.sign({
+            uid: uid,
+            data: data
         }, cert, { algorithm: 'RS512'}, resolve);
     });
 }
@@ -50,6 +48,25 @@ function register(username, crypto, keys){
             }
         })
     })
+}
+
+function putBlock(uid, bid, block, cert){
+    var raw;
+    return block.getRaw().then(function(r){
+        raw = r;
+        var checkSum = Crypto.checkSum(raw);
+        
+        return jwtSign(uid, cert, {bid: bid, checkSum: checkSum});
+    }).then(function(jwt){
+        return rp({
+            uri: location.origin + "/block",
+            method: 'PUT',
+            body: raw.toString('base64'),
+            headers: {
+                Authorization: jwt
+            }
+        })
+    });
 }
 
 function getInfo(username){
@@ -80,6 +97,11 @@ Crypto("is da boss").then(function(c){
 }).then(function(priv){
     keys = {pub: info.pub, priv: priv};
     console.log(keys);
+    var block = new Block(crypto);
+    block.setLean(new Buffer("fireant is da boss"));
+    return putBlock(info.uid, 0, block, keys.priv);
+}).then(function(data){
+    console.log(data);
 })
 .catch(function (err){
     throw err;

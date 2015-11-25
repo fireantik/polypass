@@ -5,6 +5,8 @@ var db = require('./db.js');
 var bodyParser = require('body-parser');
 var jwt = require('jsonwebtoken');
 var browserify = require('browserify-middleware');
+var getRawBody = require('raw-body');
+var concat = require('concat-stream');
 var app = express();
 
 app.use(express.static('./static'));
@@ -49,37 +51,42 @@ app.post('/register', bodyParser.urlencoded(), function (req, res) {
 });
 
 function authorize(req, res, next){
-    if(!req.headers.Authorization) return res.status(401).end('Authorization missing');
+    if(!req.headers.authorization) return res.status(401).end('Authorization missing');
+    console.log("authorizing");
 
     var decoded;
     try {
-        decoded = jwt.decode(req.headers.Authorization);
+        decoded = jwt.decode(req.headers.authorization);
     }
     catch(ex) {
         return res.status(500).end('Error while decoding JWT');
     }
 
     if(!decoded.uid) return res.status(400).end('UID missing');
+    if(!decoded.data) return res.status(400).end('Data missing');
 
     db.User.findById(decoded.uid).then(function(user){
         if(!user) return res.status(400).end('Unknown user');
-        jwt.verify(req.headers.Authorization, user.pub, function(err, d){
+        jwt.verify(req.headers.authorization, user.pub, function(err, d){
             if(err) return res.status(401).end('Error while verifying JWT');
-            req.jwt = d;
+            req.jwt = d.data;
+            console.log("authorized", req.jwt);
             next();
         });
     });
 }
 
 app.use('/block', function (req, res, next) {
-    getRawBody(req, {
-        length: req.headers['content-length'],
-        limit: '50mb'
-    });
+    console.log("getrawbody");
+    req.pipe(concat(function(data){
+        res.body = data; 
+        next();
+    }));
 });
 
 app.put('/block', authorize, function(req, res){
     if(!req.jwt.bid) return res.status(400).end('Missing block id');
+    console.log("put");
 
     db.Block.insertOrUpdate({uid: req.jwt.uid, bid: req.jwt.bid, data: req.body}).then(function(block){
         return res.json({success: true});
@@ -87,6 +94,7 @@ app.put('/block', authorize, function(req, res){
 });
 
 app.get('/block', authorize, function(req, res) {
+    console.log("get");
     if(!req.jwt.bid) return res.status(400).end('Missing block id');
 
     db.Block.findOne({where: {uid: req.jwt.uid, bid: req.jwt.bid}}).then(function(block){
