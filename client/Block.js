@@ -1,6 +1,5 @@
-var Crypto = require('./crypto.js');
-var Compression = require('./compression.js');
-var fs = require('fs');
+var Crypto = require('./../common/Crypto.js');
+var Compression = require('./Compression.js');
 
 function Block(crypto){
 	this.crypto = crypto;

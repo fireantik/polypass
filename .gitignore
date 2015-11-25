@@ -33,3 +33,5 @@ node_modules
 .c9
 .idea
 db.sqlite
+static/js
+static/css

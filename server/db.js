@@ -2,7 +2,7 @@
 
 var Sequelize = require('sequelize');
 var sequelize = new Sequelize('sqlite://db.sqlite');
-var Crypto = require('./crypto.js');
+var Crypto = require('./../common/Crypto.js');
 
 var maxBlockSize = 25 * 1024 * 1024;
 

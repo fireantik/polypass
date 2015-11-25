@@ -1,6 +1,6 @@
 "use strict";
-var Block = require('./BlockManager.js');
-var Crypto = require('./crypto.js');
+var Block = require('./Block.js');
+var Crypto = require('./../common/Crypto.js');
 var rp = require('request-promise');
 var jwt = require('jsonwebtoken');
 var NodeRSA = require('node-rsa');

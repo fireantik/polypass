@@ -4,14 +4,11 @@ var express = require('express');
 var db = require('./db.js');
 var bodyParser = require('body-parser');
 var jwt = require('jsonwebtoken');
-var browserify = require('browserify-middleware');
 var getRawBody = require('raw-body');
-var concat = require('concat-stream');
-var Crypto = require('./crypto.js');
+var Crypto = require('./../common/Crypto.js');
 var app = express();
 
 app.use(express.static('./static'));
-app.get('/app.js', browserify(__dirname + '/client.js'));
 
 app.get('/info/:username', function (req, res) {
     db.User.findOne({username: req.params.username})
@@ -26,7 +23,7 @@ app.get('/info/:username', function (req, res) {
     })
 });
 
-app.post('/register', bodyParser.urlencoded(), function (req, res) {
+app.post('/register', bodyParser.urlencoded({extended: true}), function (req, res) {
     if(!req.body.username || !req.body.pub || !req.body.priv || !req.body.salt) return res.status(400).end('Invalid data');
 
     var query = {
@@ -80,7 +77,6 @@ function authorize(req, res, next){
 }
 
 app.use('/block', function (req, res, next) {
-    console.log("getrawbody");
     getRawBody(req, {
         limit: '25mb'
     }).then(function(body){
