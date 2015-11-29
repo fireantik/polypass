@@ -11,8 +11,15 @@ import {PasswordSelector} from './PasswordSelector.jsx';
 import {ShouldRegisterForm} from './ShouldRegisterForm.jsx';
 
 function getInitialData(){
-    var recordA = {id: Crypto.randomId(), name: "Record A", fields: []};
-    var recordB = {id: Crypto.randomId(), name: "Record B", fields: []};
+    function getFields(){
+        return [
+            {id: Crypto.randomId(), name: "username", type: "text", value: "Napoleon"},
+            {id: Crypto.randomId(), name: "password", type: "password", value: Crypto.randomId()}
+        ];
+    }
+
+    var recordA = {id: Crypto.randomId(), name: "Record A", fields: getFields()};
+    var recordB = {id: Crypto.randomId(), name: "Record B", fields: getFields()};
 
     return {
         version: 0,

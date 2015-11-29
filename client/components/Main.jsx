@@ -40,8 +40,7 @@ export class Main extends React.Component {
 
     recordChanged(id, value){
         this.records = this.records.set(id, value);
-        this.lastRecords = this.records.toSet();
-        this.props.onUpdate(this.props.data.set('records', this.lastRecords));
+        this.props.onUpdate(this.props.data.set('records', this.records.toSet()));
     }
 
     render() {
