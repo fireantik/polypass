@@ -16,6 +16,7 @@
     "gulp-run": "^1.6.11",
     "gulp-sourcemaps": "^1.6.0",
     "gulp-uglify": "^1.5.1",
+    "immutable": "^3.7.5",
     "jsonwebtoken": "^5.4.1",
     "node-cache": "^3.0.0",
     "node-rsa": "^0.2.26",

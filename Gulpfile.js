@@ -44,6 +44,8 @@ function compile(src, watch) {
 			.pipe(rename('app.js'))
 			.pipe(sourcemaps.write('./'))
 			.pipe(gulp.dest('./static/js'));
+
+
 	}
 
 	if (watch) {

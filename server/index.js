@@ -13,7 +13,7 @@ var app = express();
 app.use(express.static('./static'));
 
 app.get('/info/:username', function (req, res) {
-    db.User.findOne({username: req.params.username})
+    db.User.findOne({where: {name: req.params.username}})
     .then(function(user){
         if(!user) return res.status(404).end('Username not found');
         res.json({
@@ -22,7 +22,9 @@ app.get('/info/:username', function (req, res) {
             uid: user.uid,
             salt: user.salt
         });
-    })
+    }).catch(function(err){
+        return res.status(404).end('Error ' + err.message);
+    });
 });
 
 app.post('/register', bodyParser.urlencoded({extended: true}), function (req, res) {

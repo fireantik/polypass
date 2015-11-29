@@ -13,14 +13,13 @@ function Block(crypto){
 
 Block.prototype.getRaw = function(){
 	var self = this;
-	
 	if(self._raw instanceof Promise){
 		return self._raw;
 	}
 	else if(self._raw instanceof Buffer) {
 		return Promise.resolve(self._raw);
 	}
-	else return this._raw = Compression.compress(self._lean).then(self.crypto.encrypt).then(function(encrypted){
+	else return this._raw = Compression.compress(self._lean).then(self.crypto.encrypt.bind(self.crypto)).then(function(encrypted){
 		self._iv = encrypted.iv;
 		self._tag = encrypted.tag;
 		self._raw = encrypted.data;

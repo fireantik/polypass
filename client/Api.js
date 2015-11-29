@@ -45,7 +45,7 @@ function register(username, crypto, keys){
                 username: Crypto.quickHash(username).toString('hex'),
                 pub: keys.pub,
                 priv: priv,
-                salt: crypto.getSalt().toString('hex')
+                salt: crypto.salt.toString('hex')
             }
         })
     })
@@ -99,18 +99,27 @@ export class Api {
         getInfo(username).then(function(info){
             function tryPw(){
                 return obj.getPassword().then(function(pw){
-                    return Crypto(pw, new Buffer(info.salt, 'hex'));
+                    return new Crypto(pw, new Buffer(info.salt, 'hex')).init;
                 }).then(function(crypto){
                     self.crypto = crypto;
                     return decryptPriv(crypto, info.priv);
                 }).then(function(priv){
+                    console.log(obj.initialized);
                     self.keys = {pub: info.pub, priv: priv};
                     self.uid = info.uid;
                     obj.initialized();
                 }).catch(function(err){
-                    console.log(err);
-                    throw err;
-                    //return tryPw();
+                    if(err.message == "Unsupported state or unable to authenticate data"){
+                        if(typeof obj.invalidPassword == "function") {
+                            obj.invalidPassword();
+                            return tryPw();
+                        }
+                    }
+                    else {
+                        console.log(err);
+                        console.log(err.message);
+                        throw err;
+                    }
                 });
             }
 
@@ -120,7 +129,7 @@ export class Api {
             else throw err;
         }).then(function(should){
             if(should) {
-                return obj.getPassword().then(pw => Crypto(pw)).then(crypto => {
+                return obj.getPassword().then(pw => new Crypto(pw).init).then(crypto => {
                     self.crypto = crypto;
                     self.keys = genKey();
                     return register(username, crypto, self.keys).then(data=>self.uid = data.uid).then(obj.initialized);
@@ -138,7 +147,7 @@ export class Api {
     }
 
     writeBlock(id, data){
-        console.log(this.uid);
+        //console.log(this.uid);
         var block = new Block(this.crypto);
         block.setLean(data);
         return putBlock(this.uid, id, block, this.keys.priv);
