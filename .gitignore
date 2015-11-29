@@ -35,3 +35,4 @@ node_modules
 db.sqlite
 static/js
 static/css
+output
