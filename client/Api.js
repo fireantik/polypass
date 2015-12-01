@@ -1,7 +1,7 @@
 'use strict';
 var Block = require('./Block.js');
 var Crypto = require('./../common/Crypto.js');
-var rp = require('request-promise');
+var agent = require('superagent-promise')(require('superagent'), Promise);
 var jwt = require('jsonwebtoken');
 var NodeRSA = require('node-rsa');
 
@@ -26,17 +26,18 @@ function decryptPriv(crypto, string){
 }
 
 function jwtSign(uid, cert, data){
-    return new Promise(function(resolve){
+    /*return new Promise(function(resolve){
         return jwt.sign({
             uid: uid,
             data: data,
             expires: Date.now() + 60 * 1000
         }, cert, { algorithm: 'RS512'}, resolve);
-    });
+    });*/
 }
 
 function register(username, crypto, keys){
-    return encryptPriv(crypto, keys.priv).then(function(priv){
+    console.log("register");
+    /*return encryptPriv(crypto, keys.priv).then(function(priv){
         return rp({
             uri: location.origin + "/register",
             json: true,
@@ -48,11 +49,12 @@ function register(username, crypto, keys){
                 salt: crypto.salt.toString('hex')
             }
         })
-    })
+    })*/
 }
 
 function putBlock(uid, bid, block, cert){
-    var raw;
+    console.log("putblock");
+    /*var raw;
     return block.getRaw().then(function(r){
         raw = r;
         var checkSum = Crypto.checkSum(raw);
@@ -67,10 +69,12 @@ function putBlock(uid, bid, block, cert){
                 Authorization: jwt
             }
         })
-    });
+    });*/
 }
 
 function readBlock(uid, bid, cert){
+    console.log("readblock");
+    /*
     return jwtSign(uid, cert, {bid: bid}).then(function(jwt){
         return rp({
             uri: location.origin + "/block",
@@ -80,14 +84,11 @@ function readBlock(uid, bid, cert){
             },
             encoding: null
         });
-    })
+    })*/
 }
 
 function getInfo(username){
-    return rp({
-        uri: location.origin + "/info/" + Crypto.quickHash(username).toString('hex'),
-        json: true
-    });
+    return agent('GET', location.origin + "/info/" + Crypto.quickHash(username).toString('hex')).end().catch(console.log.bind(console));
 }
 
 export class Api {

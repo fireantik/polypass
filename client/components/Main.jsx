@@ -5,6 +5,7 @@ import Immutable from 'immutable';
 import {TagSelector} from './TagSelector.jsx';
 import {RecordSelector} from './RecordSelector.jsx';
 import {RecordEditor} from './RecordEditor.jsx';
+import {Button} from 'elemental';
 
 export class Main extends React.Component {
     constructor(props){
@@ -56,6 +57,7 @@ export class Main extends React.Component {
                 <TagSelector tags={this.tags} update={this.filterRecords.bind(this)}/>
                 <RecordSelector records={this.activeRecords} selected={x=>this.setState({currentRecord: x})}/>
                 {recordEditor}
+                <Button size="lg" type="danger">Danger button</Button>
             </div>
         )
     }

@@ -8,9 +8,54 @@ var bodyParser = require('body-parser');
 var jwt = require('jsonwebtoken');
 var getRawBody = require('raw-body');
 var Crypto = require('./../common/Crypto.js');
+var fs = require('fs');
+
+
 var app = express();
+var currentHtml = "Loading...";
+var production = false;
+
+function makeScript(url){
+    return "<script src='"+url+"'></script>\n";
+}
+
+function makeStyle(url){
+    return "<link rel='stylesheet' href='"+url+"'/>\n";
+}
+
+function addUrlPrefix(url){
+    return "/static/" + url;
+}
+
+function update(){
+    setTimeout(function(){
+        fs.readFile(__dirname + '/index.html', function(err, html){
+            if(err) {
+                console.log(err);
+                throw err;
+            }
+            fs.readFile('./info.json', function(err, data){
+                if(err) throw err;
+                data = JSON.parse(data.toString('utf-8'));
+                var scriptsHtml = data.scripts.map(addUrlPrefix).map(makeScript);
+                var stylesHtml = data.styles.map(addUrlPrefix).map(makeStyle);
+
+                currentHtml = html.toString('utf-8').replace('{{scripts}}', scriptsHtml).replace('{{styles}}', stylesHtml).replace('{{preload}}', JSON.stringify(data.preload.map(addUrlPrefix)));
+            });
+        });
+    }, 500);
+}
+
+update();
+if(!production) fs.watch('./info.json', update);
+
 
 app.use(express.static('./static'));
+app.use('/static/', express.static('./dist'));
+
+app.get('/', function(req, res){
+   return res.send(currentHtml);
+});
 
 app.get('/info/:username', function (req, res) {
     db.User.findOne({where: {name: req.params.username}})
