@@ -36,3 +36,5 @@ db.sqlite
 static/js
 static/css
 output
+dist/
+info.json
