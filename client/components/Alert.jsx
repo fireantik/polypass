@@ -9,3 +9,13 @@ export class Alert extends React.Component {
         )
     }
 }
+
+export class AlertList extends React.Component {
+    render() {
+        return (
+            <div>
+                {this.props.alerts}
+            </div>
+        )
+    }
+}

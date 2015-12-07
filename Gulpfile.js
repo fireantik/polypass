@@ -27,14 +27,44 @@ var currentScripts = [];
 var currentJsPreload = [];
 var currentCssPreload = [];
 
-function makeInfo(callback){
+function makeScript(url) {
+	return "<script src='" + url + "'></script>\n";
+}
+
+function makeStyle(url) {
+	return "<link rel='stylesheet' href='" + url + "'/>\n";
+}
+
+function addUrlPrefix(url) {
+	return "/static/" + url;
+}
+
+function makeIndex(callback) {
 	var preload = currentJsPreload.concat(currentCssPreload);
-	var all = currentStyles.concat(currentScripts).concat(currentJsPreload).concat(currentCssPreload);
-	fs.writeFile('./info.json', JSON.stringify({styles: currentStyles, scripts: currentScripts, preload: preload, all: all}, null, "\t"), callback);
+	fs.readFile(__dirname + '/index.html', function (err, html) {
+		if (err) {
+			console.log(err);
+			throw err;
+		}
+		var scriptsHtml = currentScripts.map(addUrlPrefix).map(makeScript);
+		var stylesHtml = currentStyles.map(addUrlPrefix).map(makeStyle);
+		var preloadHtml = encodeURIComponent(JSON.stringify(preload.map(addUrlPrefix)));
+		var currentHtml = html.toString('utf-8').replace('{{scripts}}', scriptsHtml).replace('{{styles}}', stylesHtml).replace('{{preload}}', preloadHtml);
+		fs.writeFile('./static/index.html', currentHtml, function (err) {
+			if (err) throw err;
+			else {
+				console.log("Rebundled.", new Date());
+				if (callback) callback();
+			}
+		});
+	});
+}
+
+function makeInfo(callback) {
+	makeIndex(callback);
 }
 
 function reloadJSStats(callback, err, stats){
-	console.log("Rebundled.", new Date());
 	if(err) {
 		//console.log(err);
 		throw err;
@@ -78,7 +108,7 @@ gulp.task('less', function (cb) {
 		});
 });
 
-gulp.task('build', ['less', 'webpack']);
+gulp.task('default', ['less', 'webpack']);
 
 gulp.task('server', function(){
 	function start(){
@@ -97,7 +127,7 @@ gulp.task('server', function(){
 gulp.task('dev', ['clean', 'server', 'webpack_watch', 'less'], function () {
 	production = false;
 
-	gulp.watch('style/**/*.less', ['less']);
+	gulp.watch('./style/**/*.less', ['less']);
 	//gulp.watch(['./server/**/*.js', './common/**/*.js'], ['server']);
 });
 

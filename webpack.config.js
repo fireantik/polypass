@@ -31,10 +31,12 @@ module.exports = {
         ]
     },
     node: {
-        console: 'empty',
-        fs: 'empty',
-        net: 'empty',
-        tls: 'empty'
+        crypto: false
+    },
+    resolve: {
+        alias: {
+            crypto: require.resolve("crypto-browserify")
+        }
     }
 };
 

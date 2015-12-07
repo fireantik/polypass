@@ -9,8 +9,13 @@ class TagSelectorItem extends React.Component {
     }
 
     render(){
+        var cls = "custom-list-group-item" + (this.props.active ? " active" : "");
+
         return (
-            <div onClick={this.props.changed}>{this.props.active ? "*" : ""}{this.props.tag.get('name')}</div>
+            <div className={cls} onClick={this.props.changed}>
+                <button className="scale">{this.props.tag.get('name')}</button>
+                <button><i className="fa fa-pencil-square-o"/></button>
+            </div>
         );
     }
 }
@@ -42,8 +47,10 @@ export class TagSelector extends React.Component {
         });
 
         return (
-            <div>
-                {tags}
+            <div id="tags-tab" className="tab">
+                <div className="custom-list-group">
+                    {tags}
+                </div>
             </div>
         )
     }

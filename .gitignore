@@ -38,3 +38,4 @@ static/css
 output
 dist/
 info.json
+static/index.html

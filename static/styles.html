@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <style>
+        html, body, #app {
+            height: 100%;
+            min-height: 100%;
+        }
+
+        #app {
+            display: flex;
+            flex-direction: column;
+        }
+
+        #header {
+            height: 48px;
+            border-bottom: 1px solid #e1e1e8;
+        }
+
+        #tabs {
+            flex-grow: 1;
+            display: flex;
+            align-items: stretch;
+        }
+
+        #tags-tab {
+            width: 15%;
+            min-width: 150px;
+            max-width: 250px;
+            border-right: 1px solid #e1e1e8;
+        }
+
+        #record-list-tab {
+            width: 30%;
+            min-width: 200px;
+            max-width: 700px;
+            border-right: 1px solid #e1e1e8;
+            /*border-left: 1px solid #e1e1e8;*/
+            /*margin-left: 8px;*/
+        }
+
+        #record-tab {
+            flex-grow: 1;
+            min-width: 500px;
+            padding: 20px;
+            padding-bottom: 0;
+        }
+
+        .tab {
+            overflow: auto;
+        }
+
+        #record-tab .input-group-btn {
+            width: inherit;
+        }
+
+        #record-tab .input-group {
+            display: flex;
+        }
+
+        .panel-title {
+            display: inline-block;
+        }
+
+        .custom-list-group-item {
+            border-bottom: 1px solid #e1e1e8;
+            display: flex;
+            padding: 0;
+        }
+
+        .custom-list-group-item button {
+            height: 100%;
+            padding: 7px 15px;
+            margin: 0;
+            border: 0;
+            background: inherit;
+            border-right: 1px solid #e1e1e8;
+            text-align: left;
+        }
+
+        .custom-list-group-item button:last-child {
+            border-right: 0;
+        }
+
+        .custom-list-group-item.active {
+            color: white;
+            background: #337ab7;
+        }
+
+        .custom-list-group-item .scale {
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div id="header" class="navbar-default">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">PolyPass</a>
+            <ul class="nav navbar-nav navbar-right">
+                <!--<li><a href="#">Donate</a></li>-->
+            </ul>
+        </div>
+    </div>
+    <div id="tabs">
+        <div id="tags-tab" class="tab">
+            <div class="custom-list-group">
+                <div class="custom-list-group-item">
+                    <button class="scale">websites</button>
+                    <button><i class="fa fa-pencil-square-o"></i></button>
+                </div>
+                <div class="custom-list-group-item active">
+                    <button class="scale">tribes</button>
+                    <button><i class="fa fa-pencil-square-o"></i></button>
+                </div>
+                <div class="custom-list-group-item">
+                    <button class="scale">bitcoin</button>
+                    <button><i class="fa fa-pencil-square-o"></i></button>
+                </div>
+                <div class="custom-list-group-item">
+                    <button class="scale">ebanking</button>
+                    <button><i class="fa fa-pencil-square-o"></i></button>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="record-list-tab" class="tab">
+            <div class="custom-list-group">
+                <div class="custom-list-group-item">
+                    <button class="scale">TribesRevengeance</button>
+                    <button><i class="fa fa-files-o"></i></button>
+                </div>
+                <div class="custom-list-group-item">
+                    <button class="scale">Google</button>
+                    <button><i class="fa fa-files-o"></i></button>
+                </div>
+                <div class="custom-list-group-item">
+                    <button class="scale">Facebook</button>
+                    <button><i class="fa fa-files-o"></i></button>
+                </div>
+                <div class="custom-list-group-item">
+                    <button class="scale">Reddit</button>
+                    <button><i class="fa fa-files-o"></i></button>
+                </div>
+                <div class="custom-list-group-item">
+                    <button class="scale">Digg</button>
+                    <button><i class="fa fa-files-o"></i></button>
+                </div>
+                <div class="custom-list-group-item active">
+                    <button class="scale">Armleg</button>
+                    <button><i class="fa fa-files-o"></i></button>
+                </div>
+                <div class="custom-list-group-item">
+                    <button class="scale">Google+</button>
+                    <button><i class="fa fa-files-o"></i></button>
+                </div>
+                <div class="custom-list-group-item">
+                    <button class="scale">Twitter</button>
+                    <button><i class="fa fa-files-o"></i></button>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="record-tab" class="tab">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Armleg</h3>
+
+                    <div class="pull-right">
+                        <span class="label label-primary">Add tag</span>
+                        <span class="label label-default"><i class="fa fa-times"></i> websites</span>
+                        <span class="label label-default"><i class="fa fa-times"></i> tribes</span>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="record0">Url</label>
+                            <input type="url" class="form-control" id="record0" placeholder="Username"
+                                   value="www.armleg.com" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="record1">Username</label>
+                            <input type="text" class="form-control" id="record1" placeholder="Username" value="fireant">
+                        </div>
+                        <div class="form-group">
+                            <label for="record2">Password</label>
+
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="record2" placeholder="Password"
+                                       value="Lorem ipsum dolor sit amet.">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-default" type="button"><i class="fa fa-magic"></i>
+                                            Generate
+                                        </button>
+                                        <button class="btn btn-default" type="button"><i class="fa fa-eye"></i> Show
+                                        </button>
+                                        <button class="btn btn-success" type="button"><i class="fa fa-files-o"></i> Copy
+                                        </button>
+                                    </span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

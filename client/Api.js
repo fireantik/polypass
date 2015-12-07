@@ -1,9 +1,10 @@
 'use strict';
 var Block = require('./Block.js');
 var Crypto = require('./../common/Crypto.js');
-var agent = require('superagent-promise')(require('superagent'), Promise);
+var request = require('superagent')
 var jwt = require('jsonwebtoken');
 var NodeRSA = require('node-rsa');
+var streamBuffers = require('stream-buffers');
 
 function genKey(){
     var key = new NodeRSA({b: 1024});
@@ -26,69 +27,86 @@ function decryptPriv(crypto, string){
 }
 
 function jwtSign(uid, cert, data){
-    /*return new Promise(function(resolve){
+    return new Promise(function (resolve) {
         return jwt.sign({
             uid: uid,
             data: data,
             expires: Date.now() + 60 * 1000
         }, cert, { algorithm: 'RS512'}, resolve);
-    });*/
+    });
 }
 
 function register(username, crypto, keys){
-    console.log("register");
-    /*return encryptPriv(crypto, keys.priv).then(function(priv){
-        return rp({
-            uri: location.origin + "/register",
-            json: true,
-            method: 'POST',
-            form: {
+    return encryptPriv(crypto, keys.priv).then(function (priv) {
+        return new Promise(function (resolve, reject) {
+            request
+                .post(location.origin + "/register")
+                .type('form')
+                .send({
                 username: Crypto.quickHash(username).toString('hex'),
                 pub: keys.pub,
                 priv: priv,
                 salt: crypto.salt.toString('hex')
-            }
-        })
-    })*/
+                })
+                .end(function (err, resp) {
+                    if (err) return reject(err);
+                    resolve(resp.body);
+                });
+        });
+    })
 }
 
 function putBlock(uid, bid, block, cert){
-    console.log("putblock");
-    /*var raw;
+    var raw;
     return block.getRaw().then(function(r){
         raw = r;
+        console.log(raw);
+        console.log(raw.toString('hex'));
         var checkSum = Crypto.checkSum(raw);
 
         return jwtSign(uid, cert, {bid: bid, checksum: checkSum.toString('hex')});
     }).then(function(jwt){
-        return rp({
-            uri: location.origin + "/block",
-            method: 'PUT',
-            body: raw,
-            headers: {
-                Authorization: jwt
-            }
-        })
-    });*/
+        return new Promise(function (resolve, reject) {
+            request
+                .put(location.origin + "/block")
+                .set('authorization', jwt)
+                .set('Content-Type', 'application/octet-stream')
+                .set('Content-Disposition', 'attachment; filename=data')
+                .send(raw)
+                .end(function (err, resp) {
+                    if (err) return reject(err);
+                    resolve(resp.body);
+                });
+        });
+    });
 }
 
 function readBlock(uid, bid, cert){
-    console.log("readblock");
-    /*
     return jwtSign(uid, cert, {bid: bid}).then(function(jwt){
-        return rp({
-            uri: location.origin + "/block",
-            method: 'GET',
-            headers: {
-                Authorization: jwt
-            },
-            encoding: null
+        return new Promise(function (resolve, reject) {
+            var stream = new streamBuffers.WritableStreamBuffer();
+
+            request
+                .get(location.origin + "/block")
+                .set('authorization', jwt)
+                .end(function (err, resp) {
+                    if (err) return reject(err);
+                    stream.end();
+                    resolve(new Buffer(resp.text, 'base64'));
+                })
         });
-    })*/
+    })
 }
 
 function getInfo(username){
-    return agent('GET', location.origin + "/info/" + Crypto.quickHash(username).toString('hex')).end().catch(console.log.bind(console));
+    return new Promise(function (resolve, reject) {
+        request
+            .get(location.origin + "/info/" + Crypto.quickHash(username).toString('hex'))
+            .end(function (err, resp) {
+                if (err) return reject(err);
+                return resolve(resp.body);
+            })
+    });
 }
 
 export class Api {
@@ -126,7 +144,7 @@ export class Api {
 
             return tryPw();
         }).catch(function(err){
-            if(err.error == "Username not found") return obj.shouldRegister();
+            if (err.message == "Not Found") return obj.shouldRegister();
             else throw err;
         }).then(function(should){
             if(should) {

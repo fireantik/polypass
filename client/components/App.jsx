@@ -5,21 +5,21 @@ import {Api} from './../Api.js';
 import Immutable from 'immutable';
 import Crypto from './../../common/Crypto.js';
 import {Main} from './Main.jsx';
-import {Alert} from './Alert.jsx';
+import {Alert, AlertList} from './Alert.jsx';
 import {UsernameSelector} from './UsernameSelector.jsx';
 import {PasswordSelector} from './PasswordSelector.jsx';
 import {ShouldRegisterForm} from './ShouldRegisterForm.jsx';
 
 function getInitialData(){
-    function getFields(){
+    function getFields(add) {
         return [
-            {id: Crypto.randomId(), name: "username", type: "text", value: "Napoleon"},
+            {id: Crypto.randomId(), name: "username", type: "text", value: "Napoleon" + add},
             {id: Crypto.randomId(), name: "password", type: "password", value: Crypto.randomId()}
         ];
     }
 
-    var recordA = {id: Crypto.randomId(), name: "Record A", fields: getFields()};
-    var recordB = {id: Crypto.randomId(), name: "Record B", fields: getFields()};
+    var recordA = {id: Crypto.randomId(), name: "Record A", fields: getFields("A")};
+    var recordB = {id: Crypto.randomId(), name: "Record B", fields: getFields("B")};
 
     return {
         version: 0,
@@ -140,12 +140,8 @@ export class App extends React.Component {
     render(){
         return (
             <div>
-                <div>
-                    {this.state.alerts}
-                </div>
-                <div>
-                    {this.getAuthState()}
-                </div>
+                <AlertList alerts={this.state.alerts}/>
+                {this.getAuthState()}
             </div>
         )
     }

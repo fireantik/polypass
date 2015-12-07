@@ -1,3 +1,98 @@
-html {
-  background: red;
+@border: 1px solid #e1e1e8;
+
+html, body, #app, #appContainer, #appContainer > div {
+  height: 100%;
+  min-height: 100%;
+}
+
+.navbar {
+  margin-bottom: 0;
+
+  .container {
+    margin-left: 10px;
+  }
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+}
+
+#header {
+  height: 48px;
+  border-bottom: @border;
+}
+
+#tabs {
+  flex-grow: 1;
+  display: flex;
+  align-items: stretch;
+}
+
+#tags-tab {
+  width: 15%;
+  min-width: 150px;
+  max-width: 250px;
+  border-right: @border;
+}
+
+#record-list-tab {
+  width: 30%;
+  min-width: 200px;
+  max-width: 700px;
+  border-right: @border;
+  /*border-left: 1px solid #e1e1e8;*/
+  /*margin-left: 8px;*/
+}
+
+#record-tab {
+  flex-grow: 1;
+  min-width: 500px;
+  padding: 20px;
+  padding-bottom: 0;
+}
+
+.tab {
+  overflow: auto;
+}
+
+#record-tab .input-group-btn {
+  width: inherit;
+}
+
+#record-tab .input-group {
+  display: flex;
+}
+
+.panel-title {
+  display: inline-block;
+}
+
+.custom-list-group-item {
+  border-bottom: @border;
+  display: flex;
+  padding: 0;
+}
+
+.custom-list-group-item button {
+  height: 100%;
+  padding: 7px 15px;
+  margin: 0;
+  border: 0;
+  background: inherit;
+  border-right: @border;
+  text-align: left;
+}
+
+.custom-list-group-item button:last-child {
+  border-right: 0;
+}
+
+.custom-list-group-item.active {
+  color: white;
+  background: #337ab7;
+}
+
+.custom-list-group-item .scale {
+  flex-grow: 1;
 }

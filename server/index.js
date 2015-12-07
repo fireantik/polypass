@@ -12,50 +12,10 @@ var fs = require('fs');
 
 
 var app = express();
-var currentHtml = "Loading...";
-var production = false;
 
-function makeScript(url){
-    return "<script src='"+url+"'></script>\n";
-}
-
-function makeStyle(url){
-    return "<link rel='stylesheet' href='"+url+"'/>\n";
-}
-
-function addUrlPrefix(url){
-    return "/static/" + url;
-}
-
-function update(){
-    setTimeout(function(){
-        fs.readFile(__dirname + '/index.html', function(err, html){
-            if(err) {
-                console.log(err);
-                throw err;
-            }
-            fs.readFile('./info.json', function(err, data){
-                if(err) throw err;
-                data = JSON.parse(data.toString('utf-8'));
-                var scriptsHtml = data.scripts.map(addUrlPrefix).map(makeScript);
-                var stylesHtml = data.styles.map(addUrlPrefix).map(makeStyle);
-
-                currentHtml = html.toString('utf-8').replace('{{scripts}}', scriptsHtml).replace('{{styles}}', stylesHtml).replace('{{preload}}', JSON.stringify(data.preload.map(addUrlPrefix)));
-            });
-        });
-    }, 500);
-}
-
-update();
-if(!production) fs.watch('./info.json', update);
-
-
+app.use(express.compress());
 app.use(express.static('./static'));
-app.use('/static/', express.static('./dist'));
-
-app.get('/', function(req, res){
-   return res.send(currentHtml);
-});
+app.use('/static/', express.static('./dist', {maxAge: 1000 * 60 * 60 * 24 * 365}));
 
 app.get('/info/:username', function (req, res) {
     db.User.findOne({where: {name: req.params.username}})
@@ -130,6 +90,8 @@ app.use('/block', function (req, res, next) {
     getRawBody(req, {
         limit: '25mb'
     }).then(function(body){
+        console.log(body);
+        console.log(body.toString('hex'));
         req.body = body;
         next();
     }).catch(function(err){
@@ -152,7 +114,8 @@ app.get('/block', authorize, function(req, res) {
 
     db.Block.findOne({where: {uid: req.jwt.uid, bid: req.jwt.bid}}).then(function(block){
         if(!block) return res.status(400).end('Block not found');
-        res.send(block.data);
+        res.set('Content-Type', 'application/octet-stream');
+        res.send(block.data.toString('base64'));
     });
 });
 

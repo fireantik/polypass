@@ -5,7 +5,22 @@ import Immutable from 'immutable';
 import {TagSelector} from './TagSelector.jsx';
 import {RecordSelector} from './RecordSelector.jsx';
 import {RecordEditor} from './RecordEditor.jsx';
-import {Button} from 'elemental';
+
+import { Navbar, Nav, NavItem, NavDropdown } from 'react-bootstrap';
+
+export class Header extends React.Component {
+    render() {
+        return (
+            <Navbar>
+                <Navbar.Header>
+                    <Navbar.Brand>
+                        <a href="#">PolyPass</a>
+                    </Navbar.Brand>
+                </Navbar.Header>
+            </Navbar>
+        );
+    }
+}
 
 export class Main extends React.Component {
     constructor(props){
@@ -53,11 +68,13 @@ export class Main extends React.Component {
         }
 
         return (
-            <div>
-                <TagSelector tags={this.tags} update={this.filterRecords.bind(this)}/>
-                <RecordSelector records={this.activeRecords} selected={x=>this.setState({currentRecord: x})}/>
-                {recordEditor}
-                <Button size="lg" type="danger">Danger button</Button>
+            <div id="app">
+                <Header id="header"/>
+                <div id="tabs">
+                    <TagSelector tags={this.tags} update={this.filterRecords.bind(this)}/>
+                    <RecordSelector records={this.activeRecords} selected={x=>this.setState({currentRecord: x})}/>
+                    {recordEditor}
+                </div>
             </div>
         )
     }

@@ -4,13 +4,20 @@ import React from 'react';
 import Immutable from 'immutable';
 
 class RecordSelectorItem extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
     shouldComponentUpdate(props){
         return this.props.record != props.record;
     }
 
     render(){
         return (
-            <div onClick={this.props.selected}>{this.props.record.get('name')}</div>
+            <div className="custom-list-group-item" onClick={this.props.selected}>
+                <button className="scale">{this.props.record.get('name')}</button>
+                <button><i className="fa fa-files-o"/></button>
+            </div>
         );
     }
 }
@@ -26,8 +33,10 @@ export class RecordSelector extends React.Component {
         });
 
         return (
-            <div>
-                {records}
+            <div id="record-list-tab" className="tab">
+                <div className="custom-list-group">
+                    {records}
+                </div>
             </div>
         )
     }

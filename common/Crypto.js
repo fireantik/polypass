@@ -106,6 +106,15 @@ Crypto.quickHashLength = quickHashLen;
 Crypto.ivLength = ivLen;
 Crypto.tagLength = tagLen;
 
+Crypto.randomInt = function (from, to) {
+  var buf = crypto.randomBytes(4);
+  var num = buf.reduce(function (prev, next) {
+    return prev + next
+  }, 0);
+  return num % (to - from) + from;
+};
+
+
 Crypto.randomHex = function(len){
   return crypto.randomBytes(len / 2).toString('hex').substring(0, len);
 };
