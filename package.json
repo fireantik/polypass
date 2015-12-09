@@ -49,8 +49,8 @@
     "webpack": "^1.12.9"
   },
   "scripts": {
-    "prepublish": "gulp build",
-    "postinstall": "gulp build",
+    "prepublish": "gulp",
+    "postinstall": "gulp",
     "start": "node ./server/index.js"
   }
 }

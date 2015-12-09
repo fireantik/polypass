@@ -13,7 +13,7 @@ var fs = require('fs');
 
 var app = express();
 
-app.use(express.compress());
+//app.use(express.compress());
 app.use(express.static('./static'));
 app.use('/static/', express.static('./dist', {maxAge: 1000 * 60 * 60 * 24 * 365}));
 
