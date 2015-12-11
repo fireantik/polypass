@@ -82,8 +82,7 @@ gulp.task("webpack", function(callback) {
 
 gulp.task("webpack_watch", function() {
 	return compiler.watch({
-		aggregateTimeout: 300,
-		poll: true
+		aggregateTimeout: 300
 	}, reloadJSStats.bind(null, null));
 });
 
