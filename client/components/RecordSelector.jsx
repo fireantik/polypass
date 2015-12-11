@@ -28,9 +28,11 @@ export class RecordSelector extends React.Component {
     }
 
     render() {
-        let records = this.props.records.map(record => {
-            return <RecordSelectorItem key={record.get('id')} record={record} selected={this.props.selected.bind(null, record.get('id'))}  />
-        });
+        let records = this.props.records
+			.sort((a,b) => a.get('name').toLowerCase() > b.get('name').toLowerCase())
+			.map(record => {
+				return <RecordSelectorItem key={record.get('id')} record={record} selected={this.props.selected.bind(null, record.get('id'))}  />
+			});
 
         return (
             <div id="record-list-tab" className="tab">
