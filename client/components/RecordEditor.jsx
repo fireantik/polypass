@@ -25,7 +25,7 @@ class CopyBtn extends React.Component {
     render() {
         return (
             <ReactZeroClipboard text={this.props.val}>
-                <Button bsStyle="success" data-clipboard-target="#bar">
+                <Button bsStyle="success">
                     <i className="fa fa-files-o"/> Copy
                 </Button>
             </ReactZeroClipboard>
@@ -46,12 +46,7 @@ class GenerateBtn extends React.Component {
     }
 
     render() {
-        var pwgen = false;
-
-        if (this.state.generating) {
-            pwgen =
-                <PasswordGenerator onClose={_=>this.setState({generating: false})} onValue={this.onValue.bind(this)}/>;
-        }
+        var pwgen = <PasswordGenerator visible={this.state.generating} onClose={_=>this.setState({generating: false})} onValue={this.onValue.bind(this)}/>;
 
         return (
             <Button onClick={_=>this.setState({generating: true})}><i className="fa fa-magic"/> Generate{pwgen}</Button>

@@ -37,6 +37,7 @@
     "react-addons-css-transition-group": "^0.14.3",
     "react-bootstrap": "^0.28.1",
     "react-dom": "^0.14.3",
+    "react-modal": "^0.6.1",
     "react-zeroclipboard": "^1.1.0",
     "request-promise": "^1.0.2",
     "sequelize": "^3.14.1",

@@ -2,9 +2,26 @@
 
 import React from 'react';
 import Immutable from 'immutable';
-import {Modal, Button, Input, ButtonInput} from 'react-bootstrap';
+//import {Modal, Button, Input, ButtonInput} from 'react-bootstrap';
+import {Button, Input, ButtonInput} from 'react-bootstrap';
 import Rcslider from 'rc-slider';
 import Crypto from './../../common/Crypto.js';
+import Modal from 'react-modal';
+
+
+const customStyles = {
+	content : {
+		top					: '50%',
+		left				: '50%',
+		right				: 'auto',
+		bottom				: 'auto',
+		marginRight			: '-50%',
+		transform			: 'translate(-50%, -50%)',
+		width				: '600px',
+		height				: '90%'
+	}
+};
+
 
 export class PasswordGenerator extends React.Component {
     constructor(props) {
@@ -84,31 +101,32 @@ export class PasswordGenerator extends React.Component {
     }
 
     render() {
-        var sample = this.state.sample ? this.generateInfo() : false;
+        var sample = (this.state.sample && this.refs.len) ? this.generateInfo() : false;
         var keyspace = <p>Keyspace: {JSON.stringify(this.state.keySpace)}</p>;
 
 		var checkBoxes = [];
 		for(var [key, value] of this.state.checkBoxes){
-			checkBoxes.push(<Input key={key} ref={key} type="checkbox" label={value.get('label')} onChange={this.recalculate.bind(this, true, key)} checked={value.get('checked')}/>);
+			checkBoxes.push(<Input
+				key={key}
+				ref={key}
+				type="checkbox"
+				label={value.get('label')}
+				onChange={this.recalculate.bind(this, true, key)}
+				checked={value.get('checked')}
+			/>);
 		}
 
         return (
-            <Modal show={this.state.visible} onHide={this.props.onClose}>
-                <form onSubmit={this.generate.bind(this)}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Password generator</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <h4>Key space</h4>
-						{checkBoxes}
-						<Input ref="len" type="number" label="Length" defaultValue="16" onChange={this.recalculate.bind(this, true)}/>
-                        {sample}
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <ButtonInput type="submit" value="Generate"/>
-                    </Modal.Footer>
-                </form>
-            </Modal>
+			<Modal style={customStyles} isOpen={this.props.visible} onRequestClose={this.props.onClose}>
+			    <form onSubmit={this.generate.bind(this)}>
+					<h1>Password generator</h1>
+					<h4>Key space</h4>
+					{checkBoxes}
+					<Input ref="len" type="number" label="Length" defaultValue="16" onChange={this.recalculate.bind(this, true)}/>
+					{sample}
+					<ButtonInput type="submit" value="Generate"/>
+			    </form>
+			</Modal>
         );
     }
 }
