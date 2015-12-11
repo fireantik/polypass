@@ -45,6 +45,10 @@ export class Main extends React.Component {
         return this.state.activeRecords.map(this.records.get.bind(this.records));
     }
 
+	getTagsFor(id){
+		return this.tags.filter(t=>t.get('records').contains(id));
+	}
+
     updateRecords(records){
         this.records = records.reduce((prev, next) => prev.set(next.get('id'), next), Immutable.Map());
     }
@@ -59,12 +63,18 @@ export class Main extends React.Component {
         this.props.onUpdate(this.props.data.set('records', this.records.toSet()));
     }
 
+	setTags(tags){
+		console.log("setting tags to", tags.toJS());
+		let newData = this.props.data.set('tags', tags);
+		this.props.onUpdate(newData);
+	}
+
     render() {
         var recordEditor = false;
 
         if(this.state.currentRecord){
             var changeBind = this.recordChanged.bind(this, this.state.currentRecord);
-            recordEditor = <RecordEditor key={this.state.currentRecord} record={this.records.get(this.state.currentRecord)} changed={changeBind}/>;
+            recordEditor = <RecordEditor tags={this.tags} setTags={this.setTags.bind(this)} getTags={this.getTagsFor.bind(this)} key={this.state.currentRecord} record={this.records.get(this.state.currentRecord)} changed={changeBind}/>;
         }
 
         return (

@@ -12,7 +12,7 @@ export class UsernameSelector extends React.Component {
     render(){
         return (
             <form id="username_form" onSubmit={this.onSubmit.bind(this)}>
-                <input type="text" placeholder="Username" ref="username" />
+                <input type="text" placeholder="Username" ref="username" required />
                 <input type="submit" />
             </form>
         );

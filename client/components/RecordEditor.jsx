@@ -2,7 +2,8 @@
 
 import React from 'react';
 import Immutable from 'immutable';
-import {Panel, Input, Button} from 'react-bootstrap';
+import Crypto from './../../common/Crypto.js';
+import {Panel, Input, Button, ButtonInput} from 'react-bootstrap';
 import ReactZeroClipboard from 'react-zeroclipboard';
 import {PasswordGenerator} from './PasswordGenerator.jsx';
 
@@ -91,10 +92,85 @@ class PasswordField extends React.Component {
     }
 }
 
+class TagLabel extends React.Component {
+	render(){
+		return (
+			<span className="label label-default tag-label">
+				<button onClick={this.props.removeTag.bind(null, this.props.record.get('id'), this.props.tag.get('id'))}>
+					<i className="fa fa-times" />
+				</button>
+				{this.props.tag.get('name')}
+			</span>
+		);
+	}
+}
+
+class AddTagForm extends React.Component {
+	constructor(props){
+		super(props);
+		this.state = {
+			addingTag: false,
+			value: ""
+		};
+	}
+
+	reset(){
+		this.setState({addingTag: false, value: ""});
+	}
+
+	add(e){
+		e.preventDefault();
+		let name = this.refs.tag.value;
+		let tags;
+
+		let nameTag = this.props.tags.find(t=>t.get('name') == name);
+		if(nameTag){
+			let records = nameTag.get('records').push(this.props.recordId);
+			let tag = nameTag.set('records', records);
+			tags = this.props.tags.set(this.props.tags.indexOf(nameTag), tag);
+		}
+		else {
+			let tagJS = {id: Crypto.randomId(), name: name, records: [this.props.recordId]};
+			let tag = Immutable.fromJS(tagJS);
+			tags = this.props.tags.push(tag);
+		}
+
+		this.props.setTags(tags);
+		this.reset();
+	}
+
+	render(){
+		if(this.state.addingTag){
+			let addons = [
+				<Button key="cancel" type="reset" bsStyle="warning" bsSize="small" onClick={this.reset.bind(this)}>Cancel</Button>,
+				<Button key="submit" type="submit" bsStyle="success" bsSize="small" onClick={this.add.bind(this)}>Add</Button>
+			];
+
+			return (
+				<form onSubmit={this.add.bind(this)} className="form-inline" style={{display: "inline-block"}}>
+					<span className="input-group input-group-sm">
+						<input type="text" placeholder="Tag name" ref="tag" className="form-control" required/>
+						<span className="input-group-btn">
+							{addons}
+						</span>
+					</span>
+				</form>
+			);
+		}
+		else {
+			return <button className="label label-primary" onClick={x=>this.setState({addingTag: true})}>Add tag</button>;
+		}
+	}
+}
+
 
 export class RecordEditor extends React.Component {
     constructor(props){
         super(props);
+		this.state = {
+			addingTag: false
+		};
+
         this.updateFields(props.record.get('fields'));
     }
 
@@ -119,6 +195,22 @@ export class RecordEditor extends React.Component {
         this.changed(this.props.record.set('fields', this.fields.set(id, value).toSet()));
     }
 
+	removeTag(recordId, tagId){
+		let oldTag = this.props.tags.find(t=>t.get('id') == tagId);
+		let newTag = oldTag.set('records', oldTag.get('records').delete(oldTag.get('records').indexOf(recordId)));
+
+		let oldIndex = this.props.tags.indexOf(oldTag);
+		let tags;
+		if(newTag.get('records').isEmpty()){
+			tags = this.props.tags.delete(oldIndex);
+		}
+		else {
+			tags = this.props.tags.set(oldIndex, newTag);
+		}
+
+		this.props.setTags(tags);
+	}
+
     render(){
         var fields = [];
         for(var field of this.fields.values()){
@@ -141,11 +233,21 @@ export class RecordEditor extends React.Component {
 
 
         // <EditableInput value={this.props.record.get('name')} changed={x=>this.changed(this.props.record.set('name', x))}/>
+		let tags = this.props.getTags(this.props.record.get('id')).map(t=><TagLabel removeTag={this.removeTag.bind(this)} key={t.get('id')} tag={t} record={this.props.record} />);
         return (
             <div id="record-tab" className="tab">
-                <Panel header={this.props.record.get('name')}>
-                    {fields}
-                </Panel>
+				<div className="panel panel-default">
+					<div className="panel-heading" id="record-header">
+						<h3 className="panel-title">{this.props.record.get('name')}</h3>
+						<div className="pull-right">
+							<AddTagForm tags={this.props.tags} setTags={this.props.setTags} recordId={this.props.record.get('id')} />
+							{tags}
+						</div>
+					</div>
+					<div className="panel-body">
+                    	{fields}
+					</div>
+				</div>
             </div>
         );
     }

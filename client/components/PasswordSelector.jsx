@@ -12,7 +12,7 @@ export class PasswordSelector extends React.Component {
     render(){
         return (
             <form id="password_form" onSubmit={this.onSubmit.bind(this)}>
-                <input type="password" placeholder="Password" ref="password" />
+                <input type="password" placeholder="Password" ref="password" required />
                 <input type="submit" />
             </form>
         );

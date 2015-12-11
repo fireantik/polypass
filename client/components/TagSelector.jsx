@@ -5,7 +5,7 @@ import Immutable from 'immutable';
 
 class TagSelectorItem extends React.Component {
     shouldComponentUpdate(props){
-        return this.props.tag != props.tag;
+        return this.props.tag != props.tag || this.props.active != props.active;
     }
 
     render(){
@@ -27,13 +27,13 @@ export class TagSelector extends React.Component {
     }
 
     shouldComponentUpdate(props, state){
-        if(this.props.tags == props.tags && this.state.selected == state.selected) return false;
-        else return true;
+        return !(this.props.tags == props.tags && this.state.selected == state.selected);
     }
 
     handleClick(id, tag){
         this.setState((state, props) => {
-            state.selected = state.selected.has(id) ? state.selected.delete(id) : state.selected.set(id, tag);
+            //state.selected = state.selected.has(id) ? state.selected.delete(id) : state.selected.set(id, tag);
+            state.selected = state.selected.has(id) ? Immutable.Map() : Immutable.Map().set(id, tag);
 
             var records = Immutable.Set(state.selected.values()).flatMap(tag => tag.get('records'));
             props.update(records);
@@ -46,9 +46,14 @@ export class TagSelector extends React.Component {
             return <TagSelectorItem active={this.state.selected.has(id)} key={id} tag={tag} changed={this.handleClick.bind(this, id, tag)} />;
         });
 
+		let allClass = "custom-list-group-item" + (this.state.selected.isEmpty() ? " active" : "");
+
         return (
             <div id="tags-tab" className="tab">
                 <div className="custom-list-group">
+					<div className={allClass} id="show-all-records">
+						<button className="scale" onClick={_=>this.setState({selected: Immutable.Map()})}>Show all records</button>
+					</div>
                     {tags}
                 </div>
             </div>

@@ -96,3 +96,42 @@ html, body, #app, #appContainer, #appContainer > div {
 .custom-list-group-item .scale {
   flex-grow: 1;
 }
+
+button.label {
+  height: 15px;
+  border: 0;
+  padding: 0 5px;
+}
+
+.tag-label {
+  margin-left: 5px;
+  padding-left: 0;
+
+  button {
+	border: 0;
+	height: 15px;
+	background: 0;
+	padding: 0 5px;
+  }
+}
+
+#record-header {
+  @height: 45px;
+
+  padding: 0 15px;
+  height: @height;
+  line-height: @height;
+
+  .form-inline {
+	line-height: 30px;
+  }
+}
+
+#show-all-records {
+  margin-bottom:25px;
+  border-bottom: @border;
+}
+
+.custom-list-group .custom-list-group-item:nth-child(2){
+  border-top: @border;
+}
