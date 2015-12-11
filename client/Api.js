@@ -60,8 +60,8 @@ function putBlock(uid, bid, block, cert){
     var raw;
     return block.getRaw().then(function(r){
         raw = r;
-        console.log(raw);
-        console.log(raw.toString('hex'));
+        //console.log(raw);
+        //console.log(raw.toString('hex'));
         var checkSum = Crypto.checkSum(raw);
 
         return jwtSign(uid, cert, {bid: bid, checksum: checkSum.toString('hex')});
@@ -123,7 +123,7 @@ export class Api {
                     self.crypto = crypto;
                     return decryptPriv(crypto, info.priv);
                 }).then(function(priv){
-                    console.log(obj.initialized);
+                    //console.log(obj.initialized);
                     self.keys = {pub: info.pub, priv: priv};
                     self.uid = info.uid;
                     obj.initialized();
