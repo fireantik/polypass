@@ -8,10 +8,6 @@ class RecordSelectorItem extends React.Component {
         super(props);
     }
 
-    shouldComponentUpdate(props){
-        return this.props.record != props.record;
-    }
-
     render(){
         return (
             <div className="custom-list-group-item" onClick={this.props.selected}>
@@ -23,16 +19,12 @@ class RecordSelectorItem extends React.Component {
 }
 
 export class RecordSelector extends React.Component {
-    shouldComponentUpdate(props){
-        return this.props.records != props.records;
-    }
-
     render() {
         let records = this.props.records
-			.sort((a,b) => a.get('name').toLowerCase() > b.get('name').toLowerCase())
-			.map(record => {
-				return <RecordSelectorItem key={record.get('id')} record={record} selected={this.props.selected.bind(null, record.get('id'))}  />
-			});
+			.filter((val, key) => this.props.activeRecords.contains(key))
+			.sortBy(val => val.get('name').toLowerCase())
+			.map((record, key) => <RecordSelectorItem key={key} record={record} selected={this.props.selected.bind(null, key)}  />)
+			.toArray();
 
         return (
             <div id="record-list-tab" className="tab">

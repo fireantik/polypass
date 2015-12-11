@@ -96,7 +96,7 @@ class TagLabel extends React.Component {
 	render(){
 		return (
 			<span className="label label-default tag-label">
-				<button onClick={this.props.removeTag.bind(null, this.props.record.get('id'), this.props.tag.get('id'))}>
+				<button onClick={this.props.removeTag.bind(null)}>
 					<i className="fa fa-times" />
 				</button>
 				{this.props.tag.get('name')}
@@ -123,16 +123,18 @@ class AddTagForm extends React.Component {
 		let name = this.refs.tag.value;
 		let tags;
 
-		let nameTag = this.props.tags.find(t=>t.get('name') == name);
-		if(nameTag){
-			let records = nameTag.get('records').push(this.props.recordId);
-			let tag = nameTag.set('records', records);
-			tags = this.props.tags.set(this.props.tags.indexOf(nameTag), tag);
+		let nt = this.props.tags.findEntry(t=>t.get('name') == name);
+		if(nt){
+			let [key, tag] = nt;
+
+			let records = Immutable.Set(tag.get('records')).add(this.props.recordId);
+			let newTag = tag.set('records', records);
+			tags = this.props.tags.set(key, newTag);
 		}
 		else {
-			let tagJS = {id: Crypto.randomId(), name: name, records: [this.props.recordId]};
+			let tagJS = {name: name, records: [this.props.recordId]};
 			let tag = Immutable.fromJS(tagJS);
-			tags = this.props.tags.push(tag);
+			tags = this.props.tags.set(Crypto.randomId(), tag);
 		}
 
 		this.props.setTags(tags);
@@ -163,66 +165,72 @@ class AddTagForm extends React.Component {
 	}
 }
 
-
-export class RecordEditor extends React.Component {
-    constructor(props){
-        super(props);
+export class RecordTagSector extends React.Component {
+	constructor(props){
+		super(props);
 		this.state = {
 			addingTag: false
 		};
-
-        this.updateFields(props.record.get('fields'));
-    }
-
-    componentWillReceiveProps(props){
-        let fields = props.record.get('fields');
-        if(this.props.record.get('fields') != fields) this.updateFields(fields);
-    }
-
-    updateFields(fields){
-        this.fields = fields.reduce((prev, next) => prev.set(next.get('id'), next), Immutable.Map());
-    }
-
-    nameChanged(name){
-        this.props.changed(this.props.record.set('name', name));
-    }
-
-    changed(record){
-        this.props.changed(record);
-    }
-
-    fieldChanged(id, value){
-        this.changed(this.props.record.set('fields', this.fields.set(id, value).toSet()));
-    }
+	}
 
 	removeTag(recordId, tagId){
-		let oldTag = this.props.tags.find(t=>t.get('id') == tagId);
-		let newTag = oldTag.set('records', oldTag.get('records').delete(oldTag.get('records').indexOf(recordId)));
+		let oldTag = this.props.tags.get(tagId);
+		let newTag = oldTag.set('records', Immutable.Set(oldTag.get('records')).delete(recordId));
 
-		let oldIndex = this.props.tags.indexOf(oldTag);
 		let tags;
 		if(newTag.get('records').isEmpty()){
-			tags = this.props.tags.delete(oldIndex);
+			tags = this.props.tags.delete(tagId);
 		}
 		else {
-			tags = this.props.tags.set(oldIndex, newTag);
+			tags = this.props.tags.set(tagId, newTag);
 		}
 
 		this.props.setTags(tags);
 	}
 
+	render(){
+		let tags = this.props.tags
+			.filter((_, key)=>this.props.activeTags.contains(key))
+			.map((t, key) => <TagLabel
+				key={key}
+				tag={t}
+				record={this.props.record}
+				tags={this.props.tags}
+				removeTag={this.removeTag.bind(this, this.props.recordId, key)}
+			/>)
+			.toArray();
+
+		return (
+			<div className="pull-right">
+				<AddTagForm tags={this.props.tags} recordId={this.props.recordId} setTags={this.props.setTags}/>
+				{tags}
+			</div>
+		);
+	}
+}
+
+
+export class RecordEditor extends React.Component {
+    setField(id, value){
+		let fields = this.props.record.get('fields').set(id, value);
+		let record = this.props.record.set('fields', fields);
+		this.props.updateRecord(record);
+    }
+
     render(){
         var fields = [];
-        for(var field of this.fields.values()){
+        for(var [key, field] of this.props.record.get('fields')){
             let type;
             let props = {
                 field: field,
-                key: field.get('id'),
-                changed: this.fieldChanged.bind(this, field.get('id'))
+                key: key,
+                changed: this.setField.bind(this, key)
             };
 
             switch(field.get('type')){
-                case "text": type = TextField; break;
+                case "text":
+					type = TextField;
+					break;
                 case "password":
                     type = PasswordField;
                     break;
@@ -231,18 +239,17 @@ export class RecordEditor extends React.Component {
             fields.push(React.createElement(type, props));
         }
 
-
-        // <EditableInput value={this.props.record.get('name')} changed={x=>this.changed(this.props.record.set('name', x))}/>
-		let tags = this.props.getTags(this.props.record.get('id')).map(t=><TagLabel removeTag={this.removeTag.bind(this)} key={t.get('id')} tag={t} record={this.props.record} />);
         return (
             <div id="record-tab" className="tab">
 				<div className="panel panel-default">
 					<div className="panel-heading" id="record-header">
 						<h3 className="panel-title">{this.props.record.get('name')}</h3>
-						<div className="pull-right">
-							<AddTagForm tags={this.props.tags} setTags={this.props.setTags} recordId={this.props.record.get('id')} />
-							{tags}
-						</div>
+						<RecordTagSector
+							tags={this.props.tags}
+							activeTags={this.props.activeTags}
+							recordId={this.props.recordId}
+							setTags={this.props.setTags}
+						/>
 					</div>
 					<div className="panel-body">
                     	{fields}

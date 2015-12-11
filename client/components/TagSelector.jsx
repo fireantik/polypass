@@ -23,42 +23,31 @@ class TagSelectorItem extends React.Component {
 export class TagSelector extends React.Component {
     constructor(props){
         super(props);
-        this.state = {selected: Immutable.Map()};
+        this.state = {selected: false};
     }
 
-    shouldComponentUpdate(props, state){
-        return !(this.props.tags == props.tags && this.state.selected == state.selected);
-    }
-
-    handleClick(id, tag){
-        this.setState((state, props) => {
-            //state.selected = state.selected.has(id) ? state.selected.delete(id) : state.selected.set(id, tag);
-            state.selected = Immutable.Map().set(id, tag);
-
-            var records = Immutable.Set(state.selected.values()).flatMap(tag => tag.get('records'));
-            props.update(records);
-        });
+    handleClick(id){
+		this.setState({selected: id});
+		this.props.update(this.props.tags.get(id).get('records'));
     }
 
 	handleClickAll(){
-		this.setState((state, props) => {
-			state.selected = Immutable.Set();
-
-			var records = Immutable.Set(props.tags.values()).flatMap(tag => tag.get('records'));
-			props.update(records);
-		});
+		this.setState({selected: false});
+		this.props.update(Immutable.Set());
 	}
-
 
 	render() {
         let tags = this.props.tags
-			.sort((a,b) => a.get('name').toLowerCase() > b.get('name').toLowerCase())
-			.map(tag => {
-				var id = tag.get('id');
-				return <TagSelectorItem active={this.state.selected.has(id)} key={id} tag={tag} changed={this.handleClick.bind(this, id, tag)} />;
-			});
+			.sortBy(x => x.get('name').toLowerCase())
+			.map((tag, id) => <TagSelectorItem
+				active={this.state.selected == id}
+				key={id}
+				tag={tag}
+				changed={this.handleClick.bind(this, id)}
+			/>)
+			.toArray();
 
-		let allClass = "custom-list-group-item" + (this.state.selected.isEmpty() ? " active" : "");
+		let allClass = "custom-list-group-item" + (!this.state.selected ? " active" : "");
 
         return (
             <div id="tags-tab" className="tab">

@@ -12,22 +12,27 @@ import {ShouldRegisterForm} from './ShouldRegisterForm.jsx';
 
 function getInitialData(){
     function getFields(add) {
-        return [
-            {id: Crypto.randomId(), name: "username", type: "text", value: "Napoleon" + add},
-            {id: Crypto.randomId(), name: "password", type: "password", value: Crypto.randomId()}
-        ];
+		var x = {};
+		x[Crypto.randomId()] = {name: "username", type: "text", value: "Napoleon" + add};
+		x[Crypto.randomId()] = {name: "password", type: "password", value: Crypto.randomId()};
+
+        return x;
     }
 
-    var recordA = {id: Crypto.randomId(), name: "Record A", fields: getFields("A")};
-    var recordB = {id: Crypto.randomId(), name: "Record B", fields: getFields("B")};
+	var data = {
+		version: 0,
+		tags: {},
+		records: {}
+	};
 
-    return {
-        version: 0,
-        tags: [
-            {id: Crypto.randomId(), name: "Sample tag", records: [recordA.id]}
-        ],
-        records: [recordA, recordB]
-    };
+
+	var idA = Crypto.randomId();
+	data.records[idA] = {name: "Record A", fields: getFields("A")};
+	data.records[Crypto.randomId()] = {name: "Record B", fields: getFields("B")};
+
+	data.tags[Crypto.randomId()] = {name: "Sample tag", records: [idA]};
+
+    return data;
 }
 
 const AppStates = Object.freeze({
