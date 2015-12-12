@@ -26,7 +26,7 @@ export class Main extends React.Component {
     constructor(props){
         super(props);
         this.state = {
-            activeRecords: Immutable.Set(props.data.get('records').keys()),
+            currentTag: false,
             currentRecord: null
         }
     }
@@ -39,14 +39,9 @@ export class Main extends React.Component {
 		return this.props.data.get('records');
 	}
 
-	getTagsFor(id){
-		return Immutable.Set(this.tags.filter(t=>t.get('records').contains(id)).keys());
+	getRecordIdsForTag(tagId){
+		return Immutable.Set(this.records.filter(r=>r.get('tags').contains(tagId)).keys());
 	}
-
-    filterRecords(ids){
-        if (ids.isEmpty()) this.setState({activeRecords: Immutable.Set(this.records.keys())});
-        else this.setState({activeRecords: ids});
-    }
 
     recordChanged(id, value){
         let records = this.records.set(id, value);
@@ -65,11 +60,10 @@ export class Main extends React.Component {
         if(this.state.currentRecord){
 			let id = this.state.currentRecord;
             recordEditor = <RecordEditor
-				activeTags={this.getTagsFor(id)}
 				tags={this.tags}
-				setTags={this.setTags.bind(this)}
 				key={id}
 				record={this.records.get(id)}
+				setTags={this.setTags.bind(this)}
 				updateRecord={this.recordChanged.bind(this, id)}
 				recordId={id}
 			/>;
@@ -79,8 +73,8 @@ export class Main extends React.Component {
             <div id="app">
                 <Header id="header"/>
                 <div id="tabs">
-                    <TagSelector tags={this.tags} update={this.filterRecords.bind(this)}/>
-                    <RecordSelector records={this.records} activeRecords={this.state.activeRecords} selected={x=>this.setState({currentRecord: x})}/>
+                    <TagSelector tags={this.tags} update={x => this.setState({currentTag: x})}/>
+                    <RecordSelector records={this.records} currentTag={this.state.currentTag} selected={x=>this.setState({currentRecord: x})}/>
                     {recordEditor}
                 </div>
             </div>

@@ -20,8 +20,9 @@ class RecordSelectorItem extends React.Component {
 
 export class RecordSelector extends React.Component {
     render() {
-        let records = this.props.records
-			.filter((val, key) => this.props.activeRecords.contains(key))
+		let activeRecords = this.props.currentTag ? this.props.records.filter(val => val.get('tags').contains(this.props.currentTag)) : this.props.records;
+
+        let records = activeRecords
 			.sortBy(val => val.get('name').toLowerCase())
 			.map((record, key) => <RecordSelectorItem key={key} record={record} selected={this.props.selected.bind(null, key)}  />)
 			.toArray();

@@ -28,12 +28,12 @@ export class TagSelector extends React.Component {
 
     handleClick(id){
 		this.setState({selected: id});
-		this.props.update(this.props.tags.get(id).get('records'));
+		this.props.update(id);
     }
 
 	handleClickAll(){
 		this.setState({selected: false});
-		this.props.update(Immutable.Set());
+		this.props.update(false);
 	}
 
 	render() {

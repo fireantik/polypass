@@ -116,6 +116,8 @@ export class Api {
         this.username = username;
 
         getInfo(username).then(function(info){
+			if(info.error) return obj.shouldRegister();
+
             function tryPw(){
                 return obj.getPassword().then(function(pw){
                     return new Crypto(pw, new Buffer(info.salt, 'hex')).init;
@@ -143,9 +145,6 @@ export class Api {
             }
 
             return tryPw();
-        }).catch(function(err){
-            if (err.message == "Not Found") return obj.shouldRegister();
-            else throw err;
         }).then(function(should){
             if(should) {
                 return obj.getPassword().then(pw => new Crypto(pw).init).then(crypto => {

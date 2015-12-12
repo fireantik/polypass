@@ -116,31 +116,25 @@ class AddTagForm extends React.Component {
 	add(e){
 		e.preventDefault();
 		let name = this.refs.tag.value;
-		let tags;
 
-		let nt = this.props.tags.findEntry(t=>t.get('name') == name);
-		if(nt){
-			let [key, tag] = nt;
-
-			let records = Immutable.Set(tag.get('records')).add(this.props.recordId);
-			let newTag = tag.set('records', records);
-			tags = this.props.tags.set(key, newTag);
+		var key = this.props.tags.findKey(t=>t.get('name') == name);
+		if(!key){
+			//key not found, create new tag
+			//TODO move few levels up, so records do not create new tags
+			key = Crypto.randomId();
+			let tag = Immutable.fromJS({name: name});
+			this.props.setTags(this.props.tags.set(key, tag));
 		}
-		else {
-			let tagJS = {name: name, records: [this.props.recordId]};
-			let tag = Immutable.fromJS(tagJS);
-			tags = this.props.tags.set(Crypto.randomId(), tag);
-		}
+		this.props.addTag(key);
 
-		this.props.setTags(tags);
 		this.reset();
 	}
 
 	render(){
 		if(this.state.addingTag){
 			let addons = [
-				<Button key="cancel" type="reset" bsStyle="warning" bsSize="small" onClick={this.reset.bind(this)}>Cancel</Button>,
-				<Button key="submit" type="submit" bsStyle="success" bsSize="small" onClick={this.add.bind(this)}>Add</Button>
+				<Button key="cancel" type="reset" bsStyle="warning" bsSize="small" onClick={this.reset.bind(this)}><i className="fa fa-times"/> Cancel</Button>,
+				<Button key="submit" type="submit" bsStyle="success" bsSize="small" onClick={this.add.bind(this)}><i className="fa fa-check" /> Add</Button>
 			];
 
 			return (
@@ -168,36 +162,31 @@ export class RecordTagSector extends React.Component {
 		};
 	}
 
-	removeTag(recordId, tagId){
-		let oldTag = this.props.tags.get(tagId);
-		let newTag = oldTag.set('records', Immutable.Set(oldTag.get('records')).delete(recordId));
+	removeTag(tagId){
+		let tags = Immutable.Set(this.props.activeTags).delete(tagId);
 
-		let tags;
-		if(newTag.get('records').isEmpty()){
-			tags = this.props.tags.delete(tagId);
-		}
-		else {
-			tags = this.props.tags.set(tagId, newTag);
-		}
+		this.props.setRecordTags(tags);
+	}
 
-		this.props.setTags(tags);
+	addTag(tagId){
+		let tags = Immutable.Set(this.props.activeTags).add(tagId);
+
+		this.props.setRecordTags(tags);
 	}
 
 	render(){
 		let tags = this.props.tags
-			.filter((_, key)=>this.props.activeTags.contains(key))
+			.filter((_, key) => this.props.activeTags.contains(key))
 			.map((t, key) => <TagLabel
 				key={key}
 				tag={t}
-				record={this.props.record}
-				tags={this.props.tags}
-				removeTag={this.removeTag.bind(this, this.props.recordId, key)}
+				removeTag={this.removeTag.bind(this, key)}
 			/>)
 			.toArray();
 
 		return (
 			<div className="pull-right">
-				<AddTagForm tags={this.props.tags} recordId={this.props.recordId} setTags={this.props.setTags}/>
+				<AddTagForm tags={this.props.tags} addTag={this.addTag.bind(this)} setTags={this.props.setTags}/>
 				{tags}
 			</div>
 		);
@@ -211,6 +200,11 @@ export class RecordEditor extends React.Component {
 		let record = this.props.record.set('fields', fields);
 		this.props.updateRecord(record);
     }
+
+	setRecordTags(tags){
+		let record = this.props.record.set('tags', tags);
+		this.props.updateRecord(record);
+	}
 
     render(){
         var fields = [];
@@ -241,8 +235,8 @@ export class RecordEditor extends React.Component {
 						<h3 className="panel-title">{this.props.record.get('name')}</h3>
 						<RecordTagSector
 							tags={this.props.tags}
-							activeTags={this.props.activeTags}
-							recordId={this.props.recordId}
+							activeTags={this.props.record.get('tags')}
+							setRecordTags={this.setRecordTags.bind(this)}
 							setTags={this.props.setTags}
 						/>
 					</div>

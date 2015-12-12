@@ -20,17 +20,16 @@ function getInitialData(){
     }
 
 	var data = {
-		version: 0,
 		tags: {},
 		records: {}
 	};
 
 
-	var idA = Crypto.randomId();
-	data.records[idA] = {name: "Record A", fields: getFields("A")};
-	data.records[Crypto.randomId()] = {name: "Record B", fields: getFields("B")};
+	var tagId = Crypto.randomId();
+	data.records[Crypto.randomId()] = {name: "Record A", fields: getFields("A"), tags: [tagId]};
+	data.records[Crypto.randomId()] = {name: "Record B", fields: getFields("B"), tags: []};
 
-	data.tags[Crypto.randomId()] = {name: "Sample tag", records: [idA]};
+	data.tags[tagId] = {name: "Sample tag"};
 
     return data;
 }

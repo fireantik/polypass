@@ -20,7 +20,7 @@ app.use('/static/', express.static('./dist', {maxAge: 1000 * 60 * 60 * 24 * 365}
 app.get('/info/:username', function (req, res) {
     db.User.findOne({where: {name: req.params.username}})
     .then(function(user){
-        if(!user) return res.status(404).end('Username not found');
+        if(!user) return res.json({error: "Username not found"}).end();
         res.json({
             pub: user.pub,
             priv: user.priv,
