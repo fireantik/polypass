@@ -1,7 +1,7 @@
 "use strict";
 
 import React from 'react';
-import {Api} from './../Api.js';
+import {Api} from './../Api.es6';
 import Immutable from 'immutable';
 import Crypto from './../../common/Crypto.js';
 import {Main} from './Main.jsx';
@@ -9,6 +9,8 @@ import {Alert, AlertList} from './Alert.jsx';
 import {UsernameSelector} from './UsernameSelector.jsx';
 import {PasswordSelector} from './PasswordSelector.jsx';
 import {ShouldRegisterForm} from './ShouldRegisterForm.jsx';
+import PureComponent from 'react-pure-render/component';
+import {} from './../GlobalState.es6';
 
 function getInitialData(){
     function getFields(add) {
@@ -42,7 +44,7 @@ const AppStates = Object.freeze({
     main: "MAIN"
 });
 
-export class App extends React.Component {
+export class App extends PureComponent {
     constructor(props){
         super(props);
         this.state = {

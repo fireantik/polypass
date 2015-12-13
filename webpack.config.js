@@ -17,13 +17,21 @@ module.exports = {
     module: {
         loaders: [
             {
-                test: /\.jsx?$/,
+                test: /\.jsx$/,
                 exclude: /(node_modules|bower_components)/,
                 loader: 'babel',
                 query: {
                     presets: ['react', 'es2015']
                 }
             },
+			{
+				test: /\.es6$/,
+				exclude: /(node_modules|bower_components)/,
+				loader: 'babel',
+				query: {
+					presets: ['es2015']
+				}
+			},
             {
                 test: /\.json$/,
                 loader: 'json'

@@ -27,9 +27,13 @@ export class RecordSelector extends React.Component {
 			.map((record, key) => <RecordSelectorItem key={key} record={record} selected={this.props.selected.bind(null, key)}  />)
 			.toArray();
 
+		//TODO implement creating new records
         return (
             <div id="record-list-tab" className="tab">
                 <div className="custom-list-group">
+					<div className="custom-list-group-item">
+						<button className="scale">Create new record</button>
+					</div>
                     {records}
                 </div>
             </div>

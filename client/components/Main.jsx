@@ -54,6 +54,13 @@ export class Main extends React.Component {
 		this.props.onUpdate(newData);
 	}
 
+	deleteRecord(id){
+		let records = this.records.delete(id);
+		let data = this.props.data.set('records', records);
+		this.props.onUpdate(data);
+		this.setState({currentRecord: null});
+	}
+
     render() {
         var recordEditor = false;
 
@@ -65,7 +72,7 @@ export class Main extends React.Component {
 				record={this.records.get(id)}
 				setTags={this.setTags.bind(this)}
 				updateRecord={this.recordChanged.bind(this, id)}
-				recordId={id}
+				deleteRecord={this.deleteRecord.bind(this, id)}
 			/>;
         }
 

@@ -3,7 +3,7 @@
 import React from 'react';
 import Immutable from 'immutable';
 import Crypto from './../../common/Crypto.js';
-import {Panel, Input, Button, ButtonInput} from 'react-bootstrap';
+import {Panel, Input, Button, ButtonInput, ButtonGroup} from 'react-bootstrap';
 import ReactZeroClipboard from 'react-zeroclipboard';
 import {PasswordGenerator} from './PasswordGenerator.jsx';
 
@@ -25,7 +25,7 @@ class CopyBtn extends React.Component {
     render() {
         return (
             <ReactZeroClipboard text={this.props.val}>
-                <Button bsStyle="success">
+                <Button bsStyle="info">
                     <i className="fa fa-files-o"/> Copy
                 </Button>
             </ReactZeroClipboard>
@@ -242,6 +242,11 @@ export class RecordEditor extends React.Component {
 					</div>
 					<div className="panel-body">
                     	{fields}
+
+						<ButtonGroup>
+							<Button><i className="fa fa-cog"/> Change structure</Button>
+							<Button bsStyle="danger" onClick={this.props.deleteRecord}><i className="fa fa-trash"/> Delete record</Button>
+						</ButtonGroup>
 					</div>
 				</div>
             </div>
