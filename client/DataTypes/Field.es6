@@ -1,6 +1,7 @@
 'use strict';
 
 import Immutable from 'immutable';
+import {MakeClass} from './Helpers.es6';
 
 
 /**
@@ -12,24 +13,27 @@ import Immutable from 'immutable';
  * @property {String} text
  * @property {String} type
  */
-export class Field extends Immutable.Record({
-	lastChange: Date.now(),
+export class Field extends MakeClass({
 	name: "",
-	text: "",
-	type: "text"
-}, "Field") {
+	type: "text",
+	value: ""
+}) {
+	constructor(props){
+		super(props);
+	}
 
 	/**
 	 * @param {Object} [data]
+	 * @return {Field}
 	 */
-	constructor(data){
-		if(typeof data != "object") return super({});
+	static fromJS(data){
+		if(typeof data != "object") return new Field();
 
 		var x = {
 			lastChange: Date.now(),
 			name: "",
-			text: "",
-			type: "text"
+			type: "text",
+			value: ""
 		};
 
 		if(typeof data.lastChange == "number"){
@@ -40,30 +44,14 @@ export class Field extends Immutable.Record({
 			x.name = data.name;
 		}
 
-		if(typeof data.text == "string"){
-			x.text = data.text;
-		}
-
 		if(typeof data.type == "string"){
 			x.type = data.type;
 		}
 
-		super(x);
-	}
+		if(typeof data.value == "string"){
+			x.value = data.value;
+		}
 
-	/**
-	 * @param {String} key
-	 * @param {*} value
-	 * @returns {Field}
-	 */
-	set(key, value){
-		return super.set('lastChange', Date.now()).set(key, value);
-	}
-
-	/**
-	 * @returns {Date}
-	 */
-	get changeDate(){
-		return new Date(this.lastChange);
+		return new Field(x);
 	}
 }

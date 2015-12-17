@@ -6,7 +6,7 @@ var jwt = require('jsonwebtoken');
 var NodeRSA = require('node-rsa');
 var streamBuffers = require('stream-buffers');
 
-function genKey(){
+export function genKey(){
     var key = new NodeRSA({b: 1024});
     return {
         priv: key.exportKey('pkcs1-private-pem'),
@@ -14,19 +14,19 @@ function genKey(){
     }
 }
 
-function encryptPriv(crypto, string){
+export function encryptPriv(crypto, string){
     var block = new Block(crypto);
     block.setLean(new Buffer(string));
     return block.getRaw().then(function(raw){return raw.toString('base64')});
 }
 
-function decryptPriv(crypto, string){
+export function decryptPriv(crypto, string){
     var block = new Block(crypto);
     block.setRaw(new Buffer(string, 'base64'));
     return block.getLean().then(function(raw){return raw.toString('utf-8')});
 }
 
-function jwtSign(uid, cert, data){
+export function jwtSign(uid, cert, data){
     return new Promise(function (resolve) {
         return jwt.sign({
             uid: uid,
@@ -36,7 +36,7 @@ function jwtSign(uid, cert, data){
     });
 }
 
-function register(username, crypto, keys){
+export function register(username, crypto, keys){
     return encryptPriv(crypto, keys.priv).then(function (priv) {
         return new Promise(function (resolve, reject) {
             request
@@ -56,7 +56,7 @@ function register(username, crypto, keys){
     })
 }
 
-function putBlock(uid, bid, block, cert){
+export function putBlock(uid, bid, block, cert){
     var raw;
     return block.getRaw().then(function(r){
         raw = r;
@@ -81,7 +81,7 @@ function putBlock(uid, bid, block, cert){
     });
 }
 
-function readBlock(uid, bid, cert){
+export function readBlock(uid, bid, cert){
     return jwtSign(uid, cert, {bid: bid}).then(function(jwt){
         return new Promise(function (resolve, reject) {
             var stream = new streamBuffers.WritableStreamBuffer();
@@ -98,7 +98,7 @@ function readBlock(uid, bid, cert){
     })
 }
 
-function getInfo(username){
+export function getInfo(username){
     return new Promise(function (resolve, reject) {
         request
             .get(location.origin + "/info/" + Crypto.quickHash(username).toString('hex'))

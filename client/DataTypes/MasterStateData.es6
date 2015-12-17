@@ -1,7 +1,9 @@
 'use strict';
 
 import Immutable from 'immutable';
-import {Record, Tag} from './index.es6';
+import {Record} from './Record.es6';
+import {Tag} from './Tag.es6';
+import {MakeClass} from './Helpers.es6';
 
 
 /**
@@ -12,11 +14,10 @@ import {Record, Tag} from './index.es6';
  * @property {Object.<string, Record>} records
  * @property {Object.<string, Tag>} tags
  */
-export class MasterStateData extends Immutable.Record({
-	lastChange: Date.now(),
+export class MasterStateData extends MakeClass({
 	records: Immutable.Map(),
 	tags: Immutable.Map()
-}, "MasterState") {
+}) {
 
 	/**
 	 * @param {Object} [data]
@@ -35,14 +36,14 @@ export class MasterStateData extends Immutable.Record({
 		}
 
 		if(typeof data.records == "object"){
-			for(var [key, value] of data.records){
-				x.records[key] = Record.fromJS(value);
+			for(let key in data.records){
+				x.records[key] = Record.fromJS(data.records[key]);
 			}
 		}
 
 		if(typeof data.tags == "object"){
-			for(var [key, value] of data.tags){
-				x.tags[key] = Tag.fromJS(value);
+			for(let key in data.tags){
+				x.tags[key] = Tag.fromJS(data.tags[key]);
 			}
 		}
 
@@ -50,21 +51,5 @@ export class MasterStateData extends Immutable.Record({
 		x.tags = Immutable.Map(x.tags);
 
 		super(x);
-	}
-
-	/**
-	 * @param {String} key
-	 * @param {*} value
-	 * @returns {MasterStateData}
-	 */
-	set(key, value){
-		return super.set('lastChange', Date.now()).set(key, value);
-	}
-
-	/**
-	 * @returns {Date}
-	 */
-	get changeDate(){
-		return new Date(this.lastChange);
 	}
 }

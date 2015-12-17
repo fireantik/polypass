@@ -1,6 +1,7 @@
 'use strict';
 
 import Immutable from 'immutable';
+import {MakeClass} from './Helpers.es6';
 
 
 /**
@@ -9,27 +10,15 @@ import Immutable from 'immutable';
  *
  * @property {Number} lastChange
  * @property {String} username
- * @property {Api} api
+ * @property {?String} currentRecord
+ * @property {?String} currentTag
+ * @property {Boolean} unsavedChanges
  */
-export class State extends Immutable.Record({
-	lastChange: Date.now(),
+export class State extends MakeClass({
 	username: "",
-	api: null
-}, "State") {
-
-	/**
-	 * @param {String} key
-	 * @param {*} value
-	 * @returns {State}
-	 */
-	set(key, value){
-		return super.set('lastChange', Date.now()).set(key, value);
-	}
-
-	/**
-	 * @returns {Date}
-	 */
-	 get changeDate(){
-		return new Date(this.lastChange);
-	}
+	api: null,
+	currentRecord: null,
+	currentTag: null,
+	unsavedChanges: false
+}) {
 }

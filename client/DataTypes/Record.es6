@@ -1,7 +1,8 @@
 'use strict';
 
 import Immutable from 'immutable';
-import {Field} from './index.es6';
+import {Field} from './Field.es6';
+import {MakeClass} from './Helpers.es6';
 
 
 /**
@@ -13,18 +14,17 @@ import {Field} from './index.es6';
  * @property {Array.<String>} tags
  * @property {Object.<string, Field>} fields
  */
-export class Record extends Immutable.Record({
-	lastChange: Date.now(),
+export class Record extends MakeClass({
 	name: "",
 	tags: Immutable.Set(),
 	fields: Immutable.Map()
-}, "Record") {
+}) {
 
 	/**
 	 * @param {Object} [data]
 	 */
-	constructor(data){
-		if(typeof data != "object") return super({});
+	static fromJS(data){
+		if(typeof data != "object") return new Record();
 
 		var x = {
 			lastChange: Date.now(),
@@ -37,39 +37,27 @@ export class Record extends Immutable.Record({
 			x.lastChange = data.lastChange;
 		}
 
-		if(typeof data.tags == "array"){
+		if(typeof data.name == "string"){
+			x.name = data.name;
+		}
+
+		if(Array.isArray(data.tags)){
 			for(var val of data.tags){
 				if(typeof val == "string"){
-					tags.push(val);
+					x.tags.push(val);
 				}
 			}
 		}
 
 		if(typeof data.fields == "object"){
-			for(var [key, value] of data.fields){
-				x.fields[key] = Field.fromJS(value);
+			for(var key in data.fields){
+				x.fields[key] = Field.fromJS(data.fields[key]);
 			}
 		}
 
 		x.tags = Immutable.Set(x.tags);
 		x.fields = Immutable.Map(x.fields);
 
-		super(x);
-	}
-
-	/**
-	 * @param {String} key
-	 * @param {*} value
-	 * @returns {Record}
-	 */
-	set(key, value){
-		return super.set('lastChange', Date.now()).set(key, value);
-	}
-
-	/**
-	 * @returns {Date}
-	 */
-	get changeDate(){
-		return new Date(this.lastChange);
+		return new Record(x);
 	}
 }

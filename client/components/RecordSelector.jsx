@@ -1,42 +1,41 @@
 "use strict";
 
 import React from 'react';
-import Immutable from 'immutable';
+import PureComponent from 'react-pure-render/component';
+import {setCurrentRecord} from './../GlobalState.es6';
 
-class RecordSelectorItem extends React.Component {
-    constructor(props) {
-        super(props);
-    }
+class RecordSelectorItem extends PureComponent {
+	render(){
+		var cls = "custom-list-group-item" + (this.props.active ? " active" : "");
 
-    render(){
-        return (
-            <div className="custom-list-group-item" onClick={this.props.selected}>
-                <button className="scale">{this.props.record.get('name')}</button>
-                <button><i className="fa fa-files-o"/></button>
-            </div>
-        );
-    }
+		return (
+			<div className={cls} onClick={setCurrentRecord.bind(null, this.props.id)}>
+				<button className="scale">{this.props.record.name}</button>
+				<button><i className="fa fa-files-o"/></button>
+			</div>
+		);
+	}
 }
 
-export class RecordSelector extends React.Component {
-    render() {
-		let activeRecords = this.props.currentTag ? this.props.records.filter(val => val.get('tags').contains(this.props.currentTag)) : this.props.records;
+export class RecordSelector extends PureComponent {
+	render(){
+		let activeRecords = this.props.currentTag ? this.props.records.filter(val => val.tags.contains(this.props.currentTag)) : this.props.records;
 
-        let records = activeRecords
-			.sortBy(val => val.get('name').toLowerCase())
-			.map((record, key) => <RecordSelectorItem key={key} record={record} selected={this.props.selected.bind(null, key)}  />)
+		let records = activeRecords
+			.sortBy(val => val.name.toLowerCase())
+			.map((record, key) => <RecordSelectorItem active={this.props.currentRecord == key} key={key} id={key} record={record}/>)
 			.toArray();
 
 		//TODO implement creating new records
-        return (
-            <div id="record-list-tab" className="tab">
-                <div className="custom-list-group">
+		return (
+			<div id="record-list-tab" className="tab">
+				<div className="custom-list-group">
 					<div className="custom-list-group-item">
 						<button className="scale">Create new record</button>
 					</div>
-                    {records}
-                </div>
-            </div>
-        )
-    }
+					{records}
+				</div>
+			</div>
+		)
+	}
 }

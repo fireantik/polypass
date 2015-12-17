@@ -6,17 +6,23 @@ import Crypto from './../../common/Crypto.js';
 import {Panel, Input, Button, ButtonInput, ButtonGroup} from 'react-bootstrap';
 import ReactZeroClipboard from 'react-zeroclipboard';
 import {PasswordGenerator} from './PasswordGenerator.jsx';
+import {fieldChanged} from './../GlobalState.es6';
 
 class TextField extends React.Component {
     handleChange() {
-        this.props.changed(this.props.field.set('value', this.refs.input.getValue()));
+		let val = this.refs.input.getValue();
+		let field = this.props.field.set('value', val);
+        this.props.onChange(field);
     }
 
     render(){
-        let field = this.props.field;
         return (
-            <Input ref="input" type="text" label={field.get('name')} value={field.get('value')}
-                   onChange={this.handleChange.bind(this)}/>
+            <Input ref="input"
+				   type="text"
+				   label={this.props.field.name}
+				   value={this.props.field.value}
+                   onChange={this.handleChange.bind(this)}
+			/>
         );
     }
 }
@@ -61,11 +67,14 @@ class PasswordField extends React.Component {
     }
 
     handleGenerate(x) {
-        this.props.changed(this.props.field.set('value', x));
+		let field = this.props.field.set('value', x);
+        this.props.onChange(field);
     }
 
     handleChange() {
-        this.props.changed(this.props.field.set('value', this.refs.input.getValue()));
+		let val = this.refs.input.getValue();
+		let field = this.props.field.set('value', val);
+		this.props.onChange(field);
     }
 
     render() {
@@ -78,11 +87,16 @@ class PasswordField extends React.Component {
         addons.push(<GenerateBtn key="generate" onGenerated={this.handleGenerate.bind(this)}/>);
         addons.push(<Button key="show" onClick={x=>this.setState({shown: !this.state.shown})}><i
             className={showCls}/> {this.state.shown ? "Hide" : "Show"}</Button>);
-        addons.push(<CopyBtn key="copy" val={field.get('value')}/>);
+        addons.push(<CopyBtn key="copy" val={field.value}/>);
 
         return (
-            <Input ref="input" type={type} label={field.get('name')} value={field.get('value')}
-                   onChange={this.handleChange.bind(this)} buttonAfter={addons}/>
+            <Input ref="input"
+				   type={type}
+				   label={field.name}
+				   value={field.value}
+                   onChange={this.handleChange.bind(this)}
+				   buttonAfter={addons}
+			/>
         );
     }
 }
@@ -194,7 +208,7 @@ export class RecordTagSector extends React.Component {
 }
 
 
-export class RecordEditor extends React.Component {
+/*export class RecordEditor extends React.Component {
     setField(id, value){
 		let fields = this.props.record.get('fields').set(id, value);
 		let record = this.props.record.set('fields', fields);
@@ -252,4 +266,56 @@ export class RecordEditor extends React.Component {
             </div>
         );
     }
+}*/
+
+export class RecordEditor extends React.Component {
+	get fields(){
+		let record = this.props.record;
+
+		var fields = [];
+
+		for(var [key, field] of record.fields){
+			let type;
+			let props = {
+				field: field,
+				key: key,
+				onChange: fieldChanged.bind(null, this.props.id, key)
+			};
+
+			switch(field.get('type')){
+				case "text":
+					type = TextField;
+					break;
+				case "password":
+					type = PasswordField;
+					break;
+			}
+
+			fields.push(React.createElement(type, props));
+		}
+
+		return fields;
+	}
+
+	render(){
+		let record = this.props.record;
+
+		return (
+			<div id="record-tab" className="tab">
+				<div className="panel panel-default">
+					<div className="panel-heading" id="record-header">
+						<h3 className="panel-title">{record.name}</h3>
+					</div>
+					<div className="panel-body">
+						{this.fields}
+
+						<ButtonGroup>
+							<Button><i className="fa fa-cog"/> Change structure</Button>
+							<Button bsStyle="danger"><i className="fa fa-trash"/> Delete record</Button>
+						</ButtonGroup>
+					</div>
+				</div>
+			</div>
+		);
+	}
 }

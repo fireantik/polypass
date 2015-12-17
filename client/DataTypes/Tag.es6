@@ -1,6 +1,7 @@
 'use strict';
 
 import Immutable from 'immutable';
+import {MakeClass} from './Helpers.es6';
 
 
 /**
@@ -10,16 +11,15 @@ import Immutable from 'immutable';
  * @property {Number} lastChange
  * @property {String} name
  */
-export class Tag extends Immutable.Record({
-	lastChange: Date.now(),
+export class Tag extends MakeClass({
 	name: ""
-}, "Tag") {
+}) {
 
 	/**
 	 * @param {Object} [data]
 	 */
-	constructor(data){
-		if(typeof data != "object") return super({});
+	static fromJS(data){
+		if(typeof data != "object") return new Tag();
 
 		var x = {
 			lastChange: Date.now(),
@@ -34,22 +34,6 @@ export class Tag extends Immutable.Record({
 			x.name = data.name;
 		}
 
-		super(x);
-	}
-
-	/**
-	 * @param {String} key
-	 * @param {*} value
-	 * @returns {Tag}
-	 */
-	set(key, value){
-		return super.set('lastChange', Date.now()).set(key, value);
-	}
-
-	/**
-	 * @returns {Date}
-	 */
-	get changeDate(){
-		return new Date(this.lastChange);
+		return new Tag(x);
 	}
 }

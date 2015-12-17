@@ -1,12 +1,14 @@
 "use strict";
 
 import React from 'react';
+import {api_setUsername} from './../GlobalState.es6';
+import PureComponent from 'react-pure-render/component';
 
-export class UsernameSelector extends React.Component {
+export class UsernameSelector extends PureComponent {
     onSubmit(e){
         e.preventDefault();
-        var username = this.refs.username.value;
-        this.props.onUpdate(username);
+        let username = this.refs.username.value;
+		api_setUsername(username);
     }
 
     render(){

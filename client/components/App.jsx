@@ -1,154 +1,20 @@
 "use strict";
 
 import React from 'react';
-import {Api} from './../Api.es6';
-import Immutable from 'immutable';
-import Crypto from './../../common/Crypto.js';
 import {Main} from './Main.jsx';
-import {Alert, AlertList} from './Alert.jsx';
 import {UsernameSelector} from './UsernameSelector.jsx';
-import {PasswordSelector} from './PasswordSelector.jsx';
+import {RegisterForm, LoginForm} from './PasswordSelector.jsx';
 import {ShouldRegisterForm} from './ShouldRegisterForm.jsx';
 import PureComponent from 'react-pure-render/component';
-import {} from './../GlobalState.es6';
-
-function getInitialData(){
-    function getFields(add) {
-		var x = {};
-		x[Crypto.randomId()] = {name: "username", type: "text", value: "Napoleon" + add};
-		x[Crypto.randomId()] = {name: "password", type: "password", value: Crypto.randomId()};
-
-        return x;
-    }
-
-	var data = {
-		tags: {},
-		records: {}
-	};
-
-
-	var tagId = Crypto.randomId();
-	data.records[Crypto.randomId()] = {name: "Record A", fields: getFields("A"), tags: [tagId]};
-	data.records[Crypto.randomId()] = {name: "Record B", fields: getFields("B"), tags: []};
-
-	data.tags[tagId] = {name: "Sample tag"};
-
-    return data;
-}
-
-const AppStates = Object.freeze({
-    askUsername: "ASK_USERNAME",
-    shouldRegister: "SHOULD_REGISTER",
-    askPassword: "ASK_PASSWORD",
-    loading: "LOADING",
-    main: "MAIN"
-});
+import {ApiState} from './../DataTypes/index.es6';
 
 export class App extends PureComponent {
-    constructor(props){
-        super(props);
-        this.state = {
-            state: AppStates.askUsername,
-            alerts: Immutable.List(),
-            maxAlertId: 0
-        };
-    }
-    
-    initialized(){
-        this.setState({
-            api: this.tmpApi,
-            getPasswordCB: undefined,
-            state: AppStates.loading
-        });
-
-        let prom;
-        if(this.state.registered) prom = Promise.resolve(getInitialData());
-        else prom = this.state.api.getBlock(0).then(lean => JSON.parse(lean));
-
-        prom.then(data => {
-            let state = {
-                data: Immutable.fromJS(data),
-                state: AppStates.main
-            };
-
-            if(this.state.registered) state.saveTimeout = setTimeout(this.saveMainBlock.bind(this), 5000);
-
-            this.setState(state);
-        });
-    }
-
-    removeAlert(alert){
-        var index = this.state.alerts.indexOf(alert);
-        if(index != -1) this.setState({alerts: this.state.alerts.splice(index, 1)});
-    }
-
-    addAlert(what){
-        var alert = <Alert key={this.state.maxAlertId++} message={what} />;
-        setTimeout(this.removeAlert.bind(this), 2000, alert);
-        this.setState({alerts: this.state.alerts.push(alert)});
-    }
-
-    usernameChanged(username){
-        this.tmpApi = new Api(username, {
-            getPassword: () => new Promise(resolve => {
-                this.setState({
-                    state: AppStates.askPassword,
-                    getPasswordCB: password => {
-                        this.setState({state: AppStates.loading});
-                        resolve(password);
-                    }
-                });
-            }),
-            initialized: this.initialized.bind(this),
-            shouldRegister: () => new Promise(resolve => {
-                this.setState({
-                    state: AppStates.shouldRegister,
-                    shouldRegisterCB: should => {
-                        if(should) {
-                            this.setState({state: AppStates.loading, registered: true, shouldRegisterCB: undefined});
-                            return resolve(true);
-                        }
-                        this.setState({state: AppStates.askUsername, shouldRegisterCB: undefined});
-                    }
-                });
-            }),
-            invalidPassword: () => {
-                this.addAlert("password invalid");
-                this.setState({state: AppStates.askPassword});
-            }
-        });
-
-        this.setState({username: username, state: AppStates.loading});
-    }
-
-    saveMainBlock(){
-        console.log("saving main block:", this.state.data.toJS());
-        var lean = new Buffer(JSON.stringify(this.state.data.toJS()));
-        this.state.api.writeBlock(0, lean);
-    }
-
-    onMainUpdate(data){
-        clearTimeout(this.state.saveTimeout);
-        this.setState({
-            data: data,
-            saveTimeout: setTimeout(this.saveMainBlock.bind(this), 1000)
-        });
-    }
-
-    getAuthState(){
-        if(this.state.state == AppStates.askUsername) return <UsernameSelector onUpdate={this.usernameChanged.bind(this)} />;
-        else if(this.state.state == AppStates.askPassword) return <PasswordSelector onUpdate={this.state.getPasswordCB} />;
-        else if(this.state.state == AppStates.main) return <Main data={this.state.data} onUpdate={this.onMainUpdate.bind(this)}/>;
-        else if(this.state.state == AppStates.shouldRegister) return <ShouldRegisterForm callback={this.state.shouldRegisterCB.bind(this)} />;
-        else return <h1>Working...</h1>;
-    }
-    
-    render(){
-        return (
-            <div>
-                <AlertList alerts={this.state.alerts}/>
-                {this.getAuthState()}
-            </div>
-        )
-    }
+	render(){
+		if(this.props.state.api.state == ApiState.askUsername) return <UsernameSelector />;
+		else if(this.props.state.api.state == ApiState.askLoginPassword) return <LoginForm />;
+		else if(this.props.state.api.state == ApiState.passwordInvalid) return <LoginForm invalid />;
+		else if(this.props.state.api.state == ApiState.askRegisterPassword) return <RegisterForm />;
+		else if(this.props.state.api.state == ApiState.ready) return <Main data={this.props.state.data} state={this.props.state.state}/>;
+		else return <h1>Working</h1>
+	}
 }

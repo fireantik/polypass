@@ -1,7 +1,10 @@
 'use strict';
 
 import Immutable from 'immutable';
-import {MasterStateData} from './index.es6';
+import {MasterStateData} from './MasterStateData.es6';
+import {State} from './State.es6';
+import {Api} from './Api.es6';
+import {MakeClass} from './Helpers.es6';
 
 
 /**
@@ -12,25 +15,9 @@ import {MasterStateData} from './index.es6';
  * @property {State} state
  * @property {MasterStateData} data
  */
-export class MasterState extends Immutable.Record({
-	lastChange: Date.now(),
+export class MasterState extends MakeClass({
 	state: new State(),
-	data: new MasterStateData()
-}, "MasterState") {
-
-	/**
-	 * @param {String} key
-	 * @param {*} value
-	 * @returns {MasterState}
-	 */
-	set(key, value){
-		return super.set('lastChange', Date.now()).set(key, value);
-	}
-
-	/**
-	 * @returns {Date}
-	 */
-	get changeDate(){
-		return new Date(this.lastChange);
-	}
+	data: new MasterStateData(),
+	api: new Api()
+}) {
 }
