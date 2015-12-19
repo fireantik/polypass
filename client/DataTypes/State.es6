@@ -5,6 +5,16 @@ import {MakeClass} from './Helpers.es6';
 
 
 /**
+ * @readonly
+ * @enum {String}
+ */
+export const EditingType = Object.freeze({
+	record: "RECORD",
+	tag: "TAG"
+});
+
+
+/**
  * @class State
  * @this State
  *
@@ -13,12 +23,14 @@ import {MakeClass} from './Helpers.es6';
  * @property {?String} currentRecord
  * @property {?String} currentTag
  * @property {Boolean} unsavedChanges
+ * @property {EditingType} editingType
  */
 export class State extends MakeClass({
 	username: "",
 	api: null,
 	currentRecord: null,
 	currentTag: null,
-	unsavedChanges: false
+	unsavedChanges: false,
+	editingType: EditingType.record
 }) {
 }

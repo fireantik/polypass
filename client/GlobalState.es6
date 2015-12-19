@@ -1,6 +1,6 @@
 "use strict";
 
-import {MasterState, MasterStateData, ApiState} from './DataTypes/index.es6';
+import {MasterState, MasterStateData, ApiState, Tag, EditingType} from './DataTypes/index.es6';
 import EventEmitter from 'events';
 import {getInfo, decryptPriv, genKey, register, readBlock, putBlock} from './Api.es6';
 var Block = require('./Block.js');
@@ -147,15 +147,58 @@ export function api_register(password) {
 	});
 }
 
-export function setCurrentTag(id){
-	changeMainState({currentTag: id})
+export function setCurrentTag(tagId){
+	changeMainState({currentTag: tagId});
 }
 
-export function setCurrentRecord(id){
-	changeMainState({currentRecord: id})
+export function setCurrentRecord(recordId){
+	changeMainState({currentRecord: recordId, editingType: EditingType.record});
 }
 
 export function fieldChanged(recordId, fieldId, field){
 	let newState = state.setIn(['data', 'records', recordId, 'fields', fieldId], field);
 	setState(newState);
+}
+
+export function deleteRecord(recordId){
+	let newState = state
+		.deleteIn(['data', 'records', recordId])
+		.setIn(['state', 'currentRecord'], null);
+
+	setState(newState);
+}
+
+export function setRecordTags(recordId, tags){
+	let newState = state.setIn(['data', 'records', recordId, 'tags'], tags);
+	setState(newState);
+}
+
+export function setTags(tags){
+	let newState = state.setIn(['data', 'tags'], tags);
+	setState(newState);
+}
+
+export function addRecordTag(recordId, tagName){
+	var key = state.data.tags.findKey(t => t.name == tagName);
+
+	if(!key) {
+		let tag = new Tag({name: tagName});
+		key = Crypto.randomId();
+		setTags(state.data.tags.set(key, tag));
+	}
+
+	let record = state.data.records.get(recordId);
+	setRecordTags(recordId, record.tags.add(key));
+}
+
+export function startEditingTag(tagId){
+	changeMainState({currentTag: tagId, currentRecord: null, editingType: EditingType.tag});
+}
+
+export function doneEditingTag(){
+	changeMainState({editingType: EditingType.record});
+}
+
+export function setTag(tagId, tag){
+	setTags(state.data.tags.set(tagId, tag));
 }

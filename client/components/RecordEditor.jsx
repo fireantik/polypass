@@ -6,7 +6,7 @@ import Crypto from './../../common/Crypto.js';
 import {Panel, Input, Button, ButtonInput, ButtonGroup} from 'react-bootstrap';
 import ReactZeroClipboard from 'react-zeroclipboard';
 import {PasswordGenerator} from './PasswordGenerator.jsx';
-import {fieldChanged} from './../GlobalState.es6';
+import {fieldChanged, deleteRecord, setRecordTags, setTags, addRecordTag} from './../GlobalState.es6';
 
 class TextField extends React.Component {
     handleChange() {
@@ -118,8 +118,7 @@ class AddTagForm extends React.Component {
 	constructor(props){
 		super(props);
 		this.state = {
-			addingTag: false,
-			value: ""
+			addingTag: false
 		};
 	}
 
@@ -127,19 +126,11 @@ class AddTagForm extends React.Component {
 		this.setState({addingTag: false, value: ""});
 	}
 
-	add(e){
+	handleSubmit(e){
 		e.preventDefault();
 		let name = this.refs.tag.value;
 
-		var key = this.props.tags.findKey(t=>t.get('name') == name);
-		if(!key){
-			//key not found, create new tag
-			//TODO move few levels up, so records do not create new tags
-			key = Crypto.randomId();
-			let tag = Immutable.fromJS({name: name});
-			this.props.setTags(this.props.tags.set(key, tag));
-		}
-		this.props.addTag(key);
+		addRecordTag(this.props.recordId, name);
 
 		this.reset();
 	}
@@ -148,11 +139,11 @@ class AddTagForm extends React.Component {
 		if(this.state.addingTag){
 			let addons = [
 				<Button key="cancel" type="reset" bsStyle="warning" bsSize="small" onClick={this.reset.bind(this)}><i className="fa fa-times"/> Cancel</Button>,
-				<Button key="submit" type="submit" bsStyle="success" bsSize="small" onClick={this.add.bind(this)}><i className="fa fa-check" /> Add</Button>
+				<Button key="submit" type="submit" bsStyle="success" bsSize="small"><i className="fa fa-check" /> Add</Button>
 			];
 
 			return (
-				<form onSubmit={this.add.bind(this)} className="form-inline" style={{display: "inline-block"}}>
+				<form onSubmit={this.handleSubmit.bind(this)} className="form-inline" style={{display: "inline-block"}}>
 					<span className="input-group input-group-sm">
 						<input type="text" placeholder="Tag name" ref="tag" className="form-control" required/>
 						<span className="input-group-btn">
@@ -169,28 +160,15 @@ class AddTagForm extends React.Component {
 }
 
 export class RecordTagSector extends React.Component {
-	constructor(props){
-		super(props);
-		this.state = {
-			addingTag: false
-		};
-	}
-
 	removeTag(tagId){
-		let tags = Immutable.Set(this.props.activeTags).delete(tagId);
+		let tags = Immutable.Set(this.props.recordTags).delete(tagId);
 
-		this.props.setRecordTags(tags);
-	}
-
-	addTag(tagId){
-		let tags = Immutable.Set(this.props.activeTags).add(tagId);
-
-		this.props.setRecordTags(tags);
+		setRecordTags(this.props.recordId, tags);
 	}
 
 	render(){
 		let tags = this.props.tags
-			.filter((_, key) => this.props.activeTags.contains(key))
+			.filter((_, key) => this.props.recordTags.contains(key))
 			.map((t, key) => <TagLabel
 				key={key}
 				tag={t}
@@ -198,9 +176,14 @@ export class RecordTagSector extends React.Component {
 			/>)
 			.toArray();
 
+
 		return (
 			<div className="pull-right">
-				<AddTagForm tags={this.props.tags} addTag={this.addTag.bind(this)} setTags={this.props.setTags}/>
+				<AddTagForm
+					tags={this.props.tags}
+					recordTags={this.props.recordTags}
+					recordId={this.props.recordId}
+				/>
 				{tags}
 			</div>
 		);
@@ -305,13 +288,18 @@ export class RecordEditor extends React.Component {
 				<div className="panel panel-default">
 					<div className="panel-heading" id="record-header">
 						<h3 className="panel-title">{record.name}</h3>
+						<RecordTagSector
+							tags={this.props.tags}
+							recordTags={record.tags}
+							recordId={this.props.id}
+						/>
 					</div>
 					<div className="panel-body">
 						{this.fields}
 
 						<ButtonGroup>
 							<Button><i className="fa fa-cog"/> Change structure</Button>
-							<Button bsStyle="danger"><i className="fa fa-trash"/> Delete record</Button>
+							<Button bsStyle="danger" onClick={deleteRecord.bind(null, this.props.id)}><i className="fa fa-trash"/> Delete record</Button>
 						</ButtonGroup>
 					</div>
 				</div>
