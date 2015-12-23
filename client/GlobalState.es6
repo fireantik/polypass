@@ -173,7 +173,7 @@ export function setCurrentRecord(recordId){
 	changeMainState({currentRecord: recordId, editingType: EditingType.record});
 }
 
-export function fieldChanged(recordId, fieldId, field){
+export function changeField(recordId, fieldId, field){
 	let newState = state.setIn(['data', 'records', recordId, 'fields', fieldId], field);
 	setState(newState);
 }
@@ -219,4 +219,11 @@ export function doneEditingTag(){
 
 export function setTag(tagId, tag){
 	setTags(state.data.tags.set(tagId, tag));
+}
+
+export function startEditingField(recordId, fieldId){
+	changeMainState({currentRecord: recordId, currentField: fieldId, editingType: EditingType.field});
+}
+export function doneEditingField(){
+	changeMainState({editingType: EditingType.record, currentField: null});
 }

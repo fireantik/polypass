@@ -5,27 +5,8 @@ import Immutable from 'immutable';
 import Crypto from './../../common/Crypto.js';
 import {Panel, Input, Button, ButtonInput, ButtonGroup} from 'react-bootstrap';
 import {PasswordGenerator} from './PasswordGenerator.jsx';
-import {fieldChanged, deleteRecord, setRecordTags, setTags, addRecordTag} from './../GlobalState.es6';
+import {changeField, deleteRecord, setRecordTags, setTags, addRecordTag, startEditingField} from './../GlobalState.es6';
 import CopyToClipboard from 'react-copy-to-clipboard';
-
-class TextField extends React.Component {
-    handleChange() {
-		let val = this.refs.input.getValue();
-		let field = this.props.field.set('value', val);
-        this.props.onChange(field);
-    }
-
-    render(){
-        return (
-            <Input ref="input"
-				   type="text"
-				   label={this.props.field.name}
-				   value={this.props.field.value}
-                   onChange={this.handleChange.bind(this)}
-			/>
-        );
-    }
-}
 
 class CopyBtn extends React.Component {
     render() {
@@ -60,7 +41,7 @@ class GenerateBtn extends React.Component {
     }
 }
 
-class PasswordField extends React.Component {
+class TextField extends React.Component {
     constructor(props) {
         super(props);
         this.state = {shown: false};
@@ -79,14 +60,19 @@ class PasswordField extends React.Component {
 
     render() {
         let field = this.props.field;
-        let type = this.state.shown ? "text" : "password";
+        var type = this.props.type;
 
         var addons = [];
-        var showCls = "fa fa-eye" + (this.state.shown ? "-slash" : "");
 
-        addons.push(<GenerateBtn key="generate" onGenerated={this.handleGenerate.bind(this)}/>);
-        addons.push(<Button key="show" onClick={x=>this.setState({shown: !this.state.shown})}><i
-            className={showCls}/> {this.state.shown ? "Hide" : "Show"}</Button>);
+
+		if(this.props.type == "password"){
+			type = this.state.shown ? "text" : "password"
+			var showCls = "fa fa-eye" + (this.state.shown ? "-slash" : "");
+			addons.push(<GenerateBtn key="generate" onGenerated={this.handleGenerate.bind(this)}/>);
+			addons.push(<Button key="show" onClick={x=>this.setState({shown: !this.state.shown})}><i
+				className={showCls}/> {this.state.shown ? "Hide" : "Show"}</Button>);
+		}
+        addons.push(<Button key="edit" onClick={startEditingField.bind(null, this.props.recordId, this.props.fieldId)}><i className="fa fa-cog"/> Edit</Button>);
         addons.push(<CopyBtn key="copy" val={field.value}/>);
 
         return (
@@ -190,67 +176,6 @@ export class RecordTagSector extends React.Component {
 	}
 }
 
-
-/*export class RecordEditor extends React.Component {
-    setField(id, value){
-		let fields = this.props.record.get('fields').set(id, value);
-		let record = this.props.record.set('fields', fields);
-		this.props.updateRecord(record);
-    }
-
-	setRecordTags(tags){
-		let record = this.props.record.set('tags', tags);
-		this.props.updateRecord(record);
-	}
-
-    render(){
-        var fields = [];
-        for(var [key, field] of this.props.record.get('fields')){
-            let type;
-            let props = {
-                field: field,
-                key: key,
-                changed: this.setField.bind(this, key)
-            };
-
-            switch(field.get('type')){
-                case "text":
-					type = TextField;
-					break;
-                case "password":
-                    type = PasswordField;
-                    break;
-            }
-
-            fields.push(React.createElement(type, props));
-        }
-
-        return (
-            <div id="record-tab" className="tab">
-				<div className="panel panel-default">
-					<div className="panel-heading" id="record-header">
-						<h3 className="panel-title">{this.props.record.get('name')}</h3>
-						<RecordTagSector
-							tags={this.props.tags}
-							activeTags={this.props.record.get('tags')}
-							setRecordTags={this.setRecordTags.bind(this)}
-							setTags={this.props.setTags}
-						/>
-					</div>
-					<div className="panel-body">
-                    	{fields}
-
-						<ButtonGroup>
-							<Button><i className="fa fa-cog"/> Change structure</Button>
-							<Button bsStyle="danger" onClick={this.props.deleteRecord}><i className="fa fa-trash"/> Delete record</Button>
-						</ButtonGroup>
-					</div>
-				</div>
-            </div>
-        );
-    }
-}*/
-
 export class RecordEditor extends React.Component {
 	get fields(){
 		let record = this.props.record;
@@ -262,15 +187,19 @@ export class RecordEditor extends React.Component {
 			let props = {
 				field: field,
 				key: key,
-				onChange: fieldChanged.bind(null, this.props.id, key)
+				onChange: changeField.bind(null, this.props.id, key),
+				recordId: this.props.id,
+				fieldId: key
 			};
 
-			switch(field.get('type')){
+			switch(field.type){
 				case "text":
 					type = TextField;
+					props.type = "text";
 					break;
 				case "password":
-					type = PasswordField;
+					type = TextField;
+					props.type = "password";
 					break;
 			}
 

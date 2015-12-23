@@ -40,8 +40,6 @@ export class TagEditor extends React.Component {
 	}
 
 	render() {
-
-
 		return (
 			<div id="record-tab" className="tab">
 				{this.nameEditor}
