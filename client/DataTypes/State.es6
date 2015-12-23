@@ -27,7 +27,6 @@ export const EditingType = Object.freeze({
  */
 export class State extends MakeClass({
 	username: "",
-	api: null,
 	currentRecord: null,
 	currentTag: null,
 	unsavedChanges: false,

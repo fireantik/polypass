@@ -1,6 +1,6 @@
 "use strict";
 
-import {MasterState, MasterStateData, ApiState, Tag, EditingType} from './DataTypes/index.es6';
+import {MasterState, MasterStateData, ApiState, Tag, EditingType, State, Api} from './DataTypes/index.es6';
 import EventEmitter from 'events';
 import {getInfo, decryptPriv, genKey, register, readBlock, putBlock} from './Api.es6';
 var Block = require('./Block.js');
@@ -26,8 +26,26 @@ export function setInitialState(){
 	setState(new MasterState());
 }
 
+export function setTestState(){
+	let data = generateMasterData();
+	let st = new State({
+		username: "Testicek",
+		currentTag: null,
+		currentRecord: data.records.keySeq().first()
+	});
+	let api = new Api({state: ApiState.ready});
+	setState(new MasterState({
+		data: data,
+		state: st,
+		api: api,
+		test: true
+	}));
+}
+
 export function uploadMainBlock(data){
 	console.log("uploading...", data.toJS());
+	if(state.test) return;
+
 	saveDataTimeout = null;
 	let str = JSON.stringify(data.toJS());
 	let block = new Block(state.api.crypto);

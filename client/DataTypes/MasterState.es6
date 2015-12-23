@@ -14,10 +14,12 @@ import {MakeClass} from './Helpers.es6';
  * @property {Number} lastChange
  * @property {State} state
  * @property {MasterStateData} data
+ * @property {Boolean} test
  */
 export class MasterState extends MakeClass({
 	state: new State(),
 	data: new MasterStateData(),
-	api: new Api()
+	api: new Api(),
+	test: false
 }) {
 }

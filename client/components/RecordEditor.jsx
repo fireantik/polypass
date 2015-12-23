@@ -4,9 +4,9 @@ import React from 'react';
 import Immutable from 'immutable';
 import Crypto from './../../common/Crypto.js';
 import {Panel, Input, Button, ButtonInput, ButtonGroup} from 'react-bootstrap';
-import ReactZeroClipboard from 'react-zeroclipboard';
 import {PasswordGenerator} from './PasswordGenerator.jsx';
 import {fieldChanged, deleteRecord, setRecordTags, setTags, addRecordTag} from './../GlobalState.es6';
+import CopyToClipboard from 'react-copy-to-clipboard';
 
 class TextField extends React.Component {
     handleChange() {
@@ -30,11 +30,11 @@ class TextField extends React.Component {
 class CopyBtn extends React.Component {
     render() {
         return (
-            <ReactZeroClipboard text={this.props.val}>
+            <CopyToClipboard text={this.props.val}>
                 <Button bsStyle="info">
                     <i className="fa fa-files-o"/> Copy
                 </Button>
-            </ReactZeroClipboard>
+            </CopyToClipboard>
         );
     }
 }
