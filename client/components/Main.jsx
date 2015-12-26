@@ -12,7 +12,7 @@ import {RecordStructureEditor} from './RecordStructureEditor.jsx';
 
 
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
-import {CREATE_TYPE, createNewRecord} from '../GlobalState.es6';
+import {NewRecordType, createNewRecord} from '../GlobalState.es6';
 
 export class Header extends React.Component {
     render() {
@@ -25,10 +25,10 @@ export class Header extends React.Component {
                 </Navbar.Header>
 				<Nav>
 					<NavDropdown eventKey={1} title="New record" id="basic-nav-dropdown">
-						<MenuItem eventKey={1.1} onSelect={createNewRecord.bind(null, CREATE_TYPE.simple)}>Simple</MenuItem>
-						<MenuItem eventKey={1.2} onSelect={createNewRecord.bind(null, CREATE_TYPE.web_email)}>Website (email)</MenuItem>
-						<MenuItem eventKey={1.3} onSelect={createNewRecord.bind(null, CREATE_TYPE.web_username)}>Website (username)</MenuItem>
-						<MenuItem eventKey={1.4} onSelect={createNewRecord.bind(null, CREATE_TYPE.keypair)}>Key pair</MenuItem>
+						<MenuItem eventKey={1.1} onSelect={createNewRecord.bind(null, NewRecordType.simple)}>Simple</MenuItem>
+						<MenuItem eventKey={1.2} onSelect={createNewRecord.bind(null, NewRecordType.web_email)}>Website (email)</MenuItem>
+						<MenuItem eventKey={1.3} onSelect={createNewRecord.bind(null, NewRecordType.web_username)}>Website (username)</MenuItem>
+						<MenuItem eventKey={1.4} onSelect={createNewRecord.bind(null, NewRecordType.keypair)}>Key pair</MenuItem>
 					</NavDropdown>
 				</Nav>
             </Navbar>

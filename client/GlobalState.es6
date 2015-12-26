@@ -1,6 +1,6 @@
 "use strict";
 
-import {MasterState, MasterStateData, ApiState, Tag, EditingType, State, Api, Record} from './DataTypes/index.es6';
+import {MasterState, MasterStateData, ApiState, Tag, EditingType, State, Api, Record, Field} from './DataTypes/index.es6';
 import EventEmitter from 'events';
 import {getInfo, decryptPriv, genKey, register, readBlock, putBlock} from './Api.es6';
 var Block = require('./Block.js');
@@ -232,7 +232,7 @@ export function doneEditingField(){
  * @readonly
  * @enum {String}
  */
-export const CREATE_TYPE = {
+export const NewRecordType = {
 	simple: "SIMPLE",
 	web_email: "WEBSITE_EMAIL",
 	web_username: "WEBSITE_USERNAME",
@@ -268,23 +268,21 @@ function createNewRecord_simple(){
 
 /**
  *
- * @param {CREATE_TYPE} type
+ * @param {NewRecordType} type
  */
 export function createNewRecord(type){
-	console.log("creating:", type);
-
 	let record;
 	switch (type){
-		case CREATE_TYPE.web_email:
+		case NewRecordType.web_email:
 			record = createNewRecord_website(true);
 			break;
-		case CREATE_TYPE.web_username:
+		case NewRecordType.web_username:
 			record = createNewRecord_website(false);
 			break;
-		case CREATE_TYPE.keypair:
+		case NewRecordType.keypair:
 			record = createNewRecord_keypair();
 			break;
-		case CREATE_TYPE.simple:
+		case NewRecordType.simple:
 		default:
 			record = createNewRecord_simple()
 	}
@@ -306,4 +304,41 @@ export function startEditingRecord(recordId){
 
 export function doneEditingRecord(){
 	changeMainState({editingType: EditingType.record});
+}
+
+/**
+ * @readonly
+ * @enum {String}
+ */
+export const NewFieldType = {
+	text: "TEXT",
+	password: "PASSWORD"
+};
+
+
+function createNewSimpleField(type){
+	return Field.fromJS({
+		"type": type
+	});
+}
+
+/**
+ *
+ * @param {NewFieldType} type
+ */
+export function addField(recordId, type){
+	let field;
+	switch (type){
+		case NewFieldType.password:
+			field = createNewSimpleField("password");
+			break;
+		case NewFieldType.text:
+		default:
+			field = createNewSimpleField("text")
+	}
+	let id = Crypto.randomId();
+
+	let st = state.setIn(['data', 'records', recordId, 'fields', id], field);
+	setState(st);
+	startEditingField(recordId, id);
 }

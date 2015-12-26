@@ -3,9 +3,9 @@
 import React from 'react';
 import Immutable from 'immutable';
 import Crypto from './../../common/Crypto.js';
-import {Panel, Input, Button, ButtonInput, ButtonGroup} from 'react-bootstrap';
+import {Panel, Input, Button, ButtonInput, ButtonGroup, DropdownButton, MenuItem} from 'react-bootstrap';
 import {PasswordGenerator} from './PasswordGenerator.jsx';
-import {changeField, deleteRecord, setRecordTags, setTags, addRecordTag, startEditingField, startEditingRecord} from './../GlobalState.es6';
+import {changeField, deleteRecord, setRecordTags, setTags, addRecordTag, startEditingField, startEditingRecord, NewFieldType, addField} from './../GlobalState.es6';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import {RecordTagSector} from './RecordTagComponent.jsx';
 
@@ -123,6 +123,7 @@ export class RecordEditor extends React.Component {
 
 	render(){
 		let record = this.props.record;
+		let id = this.props.id;
 
 		return (
 			<div id="record-tab" className="tab">
@@ -132,15 +133,19 @@ export class RecordEditor extends React.Component {
 						<RecordTagSector
 							tags={this.props.tags}
 							recordTags={record.tags}
-							recordId={this.props.id}
+							recordId={id}
 						/>
 					</div>
 					<div className="panel-body">
 						{this.fields}
 
 						<ButtonGroup>
-							<Button onClick={startEditingRecord.bind(null, this.props.id)}><i className="fa fa-cog"/> Edit record</Button>
-							<Button bsStyle="danger" onClick={deleteRecord.bind(null, this.props.id)}><i className="fa fa-trash"/> Delete record</Button>
+							<Button onClick={startEditingRecord.bind(null, id)}><i className="fa fa-cog"/> Edit record</Button>
+							<DropdownButton title="Add field" id="addNewField">
+								<MenuItem eventKey={1.1} onSelect={addField.bind(null, id, NewFieldType.text)}>Text</MenuItem>
+								<MenuItem eventKey={1.2} onSelect={addField.bind(null, id, NewFieldType.password)}>Password</MenuItem>
+							</DropdownButton>
+							<Button bsStyle="danger" onClick={deleteRecord.bind(null, id)}><i className="fa fa-trash"/> Delete record</Button>
 						</ButtonGroup>
 					</div>
 				</div>
