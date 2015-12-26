@@ -1,6 +1,6 @@
 "use strict";
 
-import {MasterState, MasterStateData, ApiState, Tag, EditingType, State, Api, Record, Field} from './DataTypes/index.es6';
+import {MasterState, MasterStateData, ApiState, Tag, EditingType, State, Api, Record, Field, FieldType} from './DataTypes/index.es6';
 import EventEmitter from 'events';
 import {getInfo, decryptPriv, genKey, register, readBlock, putBlock} from './Api.es6';
 var Block = require('./Block.js');
@@ -123,8 +123,8 @@ export function api_login(password){
 function generateMasterData(){
 	function getFields(add) {
 		var x = {};
-		x[Crypto.randomId()] = {name: "username", type: "text", value: "Napoleon" + add};
-		x[Crypto.randomId()] = {name: "password", type: "password", value: Crypto.randomId()};
+		x[Crypto.randomId()] = {name: "username", type: FieldType.text, value: "Napoleon" + add};
+		x[Crypto.randomId()] = {name: "password", type: FieldType.password, value: Crypto.randomId()};
 
 		return x;
 	}
@@ -252,12 +252,12 @@ function createNewRecord_simple(){
 
 	fields[Crypto.randomId()] = {
 		name: "username",
-		type: "text"
+		type: FieldType.text
 	};
 
 	fields[Crypto.randomId()] = {
 		name: "password",
-		type: "password"
+		type: FieldType.password
 	};
 
 	return Record.fromJS({
@@ -306,36 +306,15 @@ export function doneEditingRecord(){
 	changeMainState({editingType: EditingType.record});
 }
 
-/**
- * @readonly
- * @enum {String}
- */
-export const NewFieldType = {
-	text: "TEXT",
-	password: "PASSWORD"
-};
-
-
-function createNewSimpleField(type){
-	return Field.fromJS({
-		"type": type
-	});
-}
 
 /**
  *
- * @param {NewFieldType} type
+ * @param {FieldType} type
  */
 export function addField(recordId, type){
-	let field;
-	switch (type){
-		case NewFieldType.password:
-			field = createNewSimpleField("password");
-			break;
-		case NewFieldType.text:
-		default:
-			field = createNewSimpleField("text")
-	}
+	let field = Field.fromJS({
+		type: type
+	});
 	let id = Crypto.randomId();
 
 	let st = state.setIn(['data', 'records', recordId, 'fields', id], field);

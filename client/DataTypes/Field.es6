@@ -5,13 +5,24 @@ import {MakeClass} from './Helpers.es6';
 
 
 /**
+ * @readonly
+ * @enum {String}
+ */
+export const FieldType = Object.freeze({
+	text: "TEXT",
+	password: "PASSWORD",
+	email: "EMAIL",
+	url: "URL"
+});
+
+/**
  * @class Field
  * @this Field
  *
  * @property {Number} lastChange
  * @property {String} name
  * @property {String} text
- * @property {String} type
+ * @property {FieldType} type
  */
 export class Field extends MakeClass({
 	name: "",
