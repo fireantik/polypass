@@ -240,11 +240,34 @@ export const NewRecordType = {
 };
 
 function createNewRecord_keypair(){
-	return createNewRecord_simple();
+	return Record.fromJS({
+		name: "Record name",
+		fields: {}
+	});
 }
 
 function createNewRecord_website(email){
-	return createNewRecord_simple();
+	var fields = {};
+
+	fields[Crypto.randomId()] = {
+		name: email ? "email" : "username",
+		type: email ? FieldType.email : FieldType.text
+	};
+
+	fields[Crypto.randomId()] = {
+		name: "password",
+		type: FieldType.password
+	};
+
+	fields[Crypto.randomId()] = {
+		name: "url",
+		type: FieldType.url
+	};
+
+	return Record.fromJS({
+		name: "Record name",
+		fields: fields
+	});
 }
 
 function createNewRecord_simple(){
