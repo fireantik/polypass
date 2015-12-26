@@ -10,6 +10,7 @@ import {MakeClass} from './Helpers.es6';
  */
 export const EditingType = Object.freeze({
 	record: "RECORD",
+	recordStructure: "RECORD_STRUCTURE",
 	tag: "TAG",
 	field: "FIELD"
 });

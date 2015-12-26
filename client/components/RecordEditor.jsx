@@ -5,7 +5,7 @@ import Immutable from 'immutable';
 import Crypto from './../../common/Crypto.js';
 import {Panel, Input, Button, ButtonInput, ButtonGroup} from 'react-bootstrap';
 import {PasswordGenerator} from './PasswordGenerator.jsx';
-import {changeField, deleteRecord, setRecordTags, setTags, addRecordTag, startEditingField} from './../GlobalState.es6';
+import {changeField, deleteRecord, setRecordTags, setTags, addRecordTag, startEditingField, startEditingRecord} from './../GlobalState.es6';
 import CopyToClipboard from 'react-copy-to-clipboard';
 
 class CopyBtn extends React.Component {
@@ -227,7 +227,7 @@ export class RecordEditor extends React.Component {
 						{this.fields}
 
 						<ButtonGroup>
-							<Button><i className="fa fa-cog"/> Change structure</Button>
+							<Button onClick={startEditingRecord.bind(null, this.props.id)}><i className="fa fa-cog"/> Edit record</Button>
 							<Button bsStyle="danger" onClick={deleteRecord.bind(null, this.props.id)}><i className="fa fa-trash"/> Delete record</Button>
 						</ButtonGroup>
 					</div>

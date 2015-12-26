@@ -1,6 +1,6 @@
 "use strict";
 
-import {MasterState, MasterStateData, ApiState, Tag, EditingType, State, Api} from './DataTypes/index.es6';
+import {MasterState, MasterStateData, ApiState, Tag, EditingType, State, Api, Record} from './DataTypes/index.es6';
 import EventEmitter from 'events';
 import {getInfo, decryptPriv, genKey, register, readBlock, putBlock} from './Api.es6';
 var Block = require('./Block.js');
@@ -226,4 +226,84 @@ export function startEditingField(recordId, fieldId){
 }
 export function doneEditingField(){
 	changeMainState({editingType: EditingType.record, currentField: null});
+}
+
+/**
+ * @readonly
+ * @enum {String}
+ */
+export const CREATE_TYPE = {
+	simple: "SIMPLE",
+	web_email: "WEBSITE_EMAIL",
+	web_username: "WEBSITE_USERNAME",
+	keypair: "KEYPAIR"
+};
+
+function createNewRecord_keypair(){
+	return createNewRecord_simple();
+}
+
+function createNewRecord_website(email){
+	return createNewRecord_simple();
+}
+
+function createNewRecord_simple(){
+	var fields = {};
+
+	fields[Crypto.randomId()] = {
+		name: "username",
+		type: "text"
+	};
+
+	fields[Crypto.randomId()] = {
+		name: "password",
+		type: "password"
+	};
+
+	return Record.fromJS({
+		name: "Record name",
+		fields: fields
+	});
+}
+
+/**
+ *
+ * @param {CREATE_TYPE} type
+ */
+export function createNewRecord(type){
+	console.log("creating:", type);
+
+	let record;
+	switch (type){
+		case CREATE_TYPE.web_email:
+			record = createNewRecord_website(true);
+			break;
+		case CREATE_TYPE.web_username:
+			record = createNewRecord_website(false);
+			break;
+		case CREATE_TYPE.keypair:
+			record = createNewRecord_keypair();
+			break;
+		case CREATE_TYPE.simple:
+		default:
+			record = createNewRecord_simple()
+	}
+	let id = Crypto.randomId();
+
+	let st = state.setIn(['data', 'records', id], record);
+	setState(st);
+	startEditingRecord(id);
+}
+
+export function setRecord(recordId, record){
+	let st = state.setIn(['data', 'records', recordId], record);
+	setState(st);
+}
+
+export function startEditingRecord(recordId){
+	changeMainState({currentRecord: recordId, currentField: null, editingType: EditingType.recordStructure});
+}
+
+export function doneEditingRecord(){
+	changeMainState({editingType: EditingType.record});
 }

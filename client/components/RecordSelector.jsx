@@ -30,9 +30,6 @@ export class RecordSelector extends PureComponent {
 		return (
 			<div id="record-list-tab" className="tab">
 				<div className="custom-list-group">
-					<div className="custom-list-group-item">
-						<button className="scale">Create new record</button>
-					</div>
 					{records}
 				</div>
 			</div>
