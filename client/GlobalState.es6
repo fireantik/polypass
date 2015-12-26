@@ -228,6 +228,11 @@ export function doneEditingField(){
 	changeMainState({editingType: EditingType.record, currentField: null});
 }
 
+export function deleteField(recordId, fieldId){
+	let st = state.deleteIn(['data', 'records', recordId, 'fields', fieldId]);
+	setState(st);
+}
+
 /**
  * @readonly
  * @enum {String}

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import {Panel, Input, ButtonGroup, Button} from 'react-bootstrap';
-import {doneEditingField, changeField} from '../GlobalState.es6';
+import {doneEditingField, changeField, deleteField} from '../GlobalState.es6';
 import {FieldType} from '../DataTypes/index.es6';
 
 function capitalizeFirstLetter(string) {
@@ -27,6 +27,11 @@ export class FieldEditor extends React.Component {
 		doneEditingField();
 	}
 
+	handleDelete(){
+		deleteField(this.props.recordId, this.props.fieldId);
+		doneEditingField();
+	}
+
 	render() {
 		let field = this.props.field;
 		let types = Object.keys(FieldType).map(x=>FieldType[x]).map(t => <option key={t} value={t}>{capitalizeFirstLetter(t)}</option>)
@@ -41,6 +46,7 @@ export class FieldEditor extends React.Component {
 							{types}
 						</Input>
 						<ButtonGroup>
+							<Button bsStyle="danger" onClick={this.handleDelete.bind(this)}>Delete field</Button>
 							<Button type="reset">Cancel</Button>
 							<Button type="submit" bsStyle="success">Save</Button>
 						</ButtonGroup>
