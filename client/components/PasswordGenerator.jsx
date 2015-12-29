@@ -4,7 +4,6 @@ import React from 'react';
 import Immutable from 'immutable';
 //import {Modal, Button, Input, ButtonInput} from 'react-bootstrap';
 import {Button, Input, ButtonInput} from 'react-bootstrap';
-import Rcslider from 'rc-slider';
 import Crypto from './../../common/Crypto.js';
 import Modal from 'react-modal';
 

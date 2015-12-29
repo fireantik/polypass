@@ -1,19 +1,27 @@
 var webpack = require("webpack");
 var path = require('path');
 
-var production = false;
+var production = process.env.NODE_ENV == "prod" || process.env.NODE_ENV == "production";
 
 module.exports = {
     context: __dirname + "/client",
-    entry: "./app.jsx",
+    entry: {
+		app: "./app.jsx",
+		vendor: [
+			"react", "react-dom", "bootstrap/less/bootstrap.less", "react-bootstrap", "react-pure-render", "react-modal",
+			"superagent", "font-awesome-webpack", "immutable", "crypto-browserify", "jsonwebtoken"
+		]
+	},
     output: {
         path: __dirname + "/dist",
-        filename: "[chunkhash].app.entry.js",
+        filename: "[chunkhash].[name].entry.js",
         //filename: "app.js",
         chunkFilename: "[chunkhash].js"
     },
     devtool: production ? "source-map" : "cheap-module-eval-source-map",
-    plugins: [],
+    plugins: [
+		new webpack.optimize.CommonsChunkPlugin("vendor", "[chunkhash].vendor.entry.js")
+	],
     module: {
         loaders: [
             {
@@ -66,4 +74,5 @@ if(production){
             warnings: false
         }
     }));
+	module.exports.plugins.push(new webpack.optimize.DedupePlugin());
 }

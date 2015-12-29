@@ -21,7 +21,7 @@ function readOriginal(cb){
 		}
 
 		parseFiles(fil);
-		cb();
+		if(cb) cb();
 	});
 }
 
@@ -31,7 +31,7 @@ function parseFiles(filemap, removeOld){
 
 	var entries = {};
 	for(var i in files){
-		let match = /\.(.*)\.entry\./.exec(files[i]);
+		let match = /\.(.*)\.entry\.(?!.*\.map)/.exec(files[i]);
 		if(match && match[1]){
 			entries[match[1]] = files[i];
 		}
@@ -70,4 +70,8 @@ module.exports.build = function(){
 	readOriginal(function(){
 		compiler.run(compiled);
 	});
+};
+
+module.exports.readOnly = function(){
+	readOriginal();
 };

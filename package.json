@@ -9,7 +9,9 @@
     "babelify": "^7.2.0",
     "body-parser": "^1.14.1",
     "bootstrap": "^3.3.6",
+    "compression": "^1.6.0",
     "crypto-browserify": "^3.11.0",
+    "css-loader": "^0.23.1",
     "express": "^4.13.3",
     "file-loader": "^0.8.5",
     "font-awesome": "^4.5.0",
@@ -17,13 +19,15 @@
     "immutable": "^3.7.5",
     "json-loader": "^0.5.4",
     "jsonwebtoken": "^5.4.1",
+    "less": "^2.5.3",
+    "less-loader": "^2.2.2",
     "node-cache": "^3.0.0",
     "node-rsa": "^0.2.26",
+    "node-sass": "^3.4.2",
     "passport": "^0.3.2",
     "passport-http": "^0.3.0",
     "passport-http-bearer": "^1.0.1",
     "raw-body": "^2.1.4",
-    "rc-slider": "^3.1.4",
     "react": "^0.14.3",
     "react-addons-css-transition-group": "^0.14.3",
     "react-bootstrap": "^0.28.1",
@@ -33,6 +37,7 @@
     "react-pure-render": "^1.0.2",
     "request-promise": "^1.0.2",
     "rimraf": "^2.5.0",
+    "sass-loader": "^3.1.2",
     "sequelize": "^3.14.1",
     "sqlite3": "^3.1.1",
     "stream-buffers": "^3.0.0",
@@ -40,15 +45,11 @@
     "superagent": "^1.4.0",
     "superagent-promise": "^1.0.3",
     "url-loader": "^0.5.7",
-    "webpack": "^1.12.9",
-	"css-loader": "^0.23.1",
-	"less": "^2.5.3",
-	"less-loader": "^2.2.2",
-	"node-sass": "^3.4.2",
-	"sass-loader": "^3.1.2"
+    "webpack": "^1.12.9"
   },
   "scripts": {
-    "postinstall": "node -e \"require('./server/compiler.js').build()\"",
+	"build": "webpack --config webpack.config.js --progress --colors -p",
+    "postinstall": "npm run build",
     "start": "node ./server/index.js"
   }
 }

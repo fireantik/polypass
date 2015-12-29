@@ -1,6 +1,7 @@
 'use strict';
 
-console.log("starting server");
+console.log("Starting server");
+var production = process.env.NODE_ENV == "prod" || process.env.NODE_ENV == "production";
 
 var express = require('express');
 var db = require('./db.js');
@@ -9,22 +10,33 @@ var jwt = require('jsonwebtoken');
 var getRawBody = require('raw-body');
 var Crypto = require(__dirname + '/../common/Crypto.js');
 var fs = require('fs');
+var compression = require('compression')
 var compiler = require('./compiler.js');
-compiler.watch();
+if(!production) compiler.watch();
+else compiler.readOnly();
+
 
 var app = express();
 
 
-//app.use(express.compress());
+app.use(compression());
 app.use(express.static(__dirname + '/../static'));
 app.use(express.static(__dirname + '/../dist', {maxAge: 1000 * 60 * 60 * 24 * 365}));
+
+function makeScripts(scripts){
+	var out = "";
+	scripts.forEach(function(script){
+		out += "<script src='/" + compiler.entries[script] + "'></script>\n";
+	});
+	return out;
+}
 
 app.get('/', function(req, res){
 	fs.readFile(__dirname + '/index.html', function (err, data) {
 		if (err) throw err;
 		var text = data.toString('utf-8')
 			.replace('{{preload}}', encodeURIComponent(JSON.stringify(compiler.files)))
-			.replace('{{scripts}}', "<script src='/" + compiler.entries.app + "'></script>");
+			.replace('{{scripts}}', makeScripts(["vendor", "app"]));
 		res.send(text);
 	});
 });
