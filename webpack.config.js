@@ -8,7 +8,7 @@ module.exports = {
     entry: "./app.jsx",
     output: {
         path: __dirname + "/dist",
-        filename: "[hash].js",
+        filename: "[chunkhash].app.entry.js",
         //filename: "app.js",
         chunkFilename: "[chunkhash].js"
     },
@@ -35,7 +35,19 @@ module.exports = {
             {
                 test: /\.json$/,
                 loader: 'json'
-            }
+            },
+			{
+				test: /\.less$/,
+				loader: "style!css!less"
+			},
+			{
+				test: /\.scss$/,
+				loaders: ["style", "css", "sass"]
+			},
+			{test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=application/font-woff'},
+			{test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=application/octet-stream'},
+			{test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: 'file'},
+			{test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: 'url?limit=10000&mimetype=image/svg+xml'}
         ]
     },
     node: {

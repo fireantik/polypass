@@ -7,15 +7,27 @@ var db = require('./db.js');
 var bodyParser = require('body-parser');
 var jwt = require('jsonwebtoken');
 var getRawBody = require('raw-body');
-var Crypto = require('./../common/Crypto.js');
+var Crypto = require(__dirname + '/../common/Crypto.js');
 var fs = require('fs');
-
+var compiler = require('./compiler.js');
+compiler.watch();
 
 var app = express();
 
+
 //app.use(express.compress());
-app.use(express.static('./static'));
-app.use('/static/', express.static('./dist', {maxAge: 1000 * 60 * 60 * 24 * 365}));
+app.use(express.static(__dirname + '/../static'));
+app.use(express.static(__dirname + '/../dist', {maxAge: 1000 * 60 * 60 * 24 * 365}));
+
+app.get('/', function(req, res){
+	fs.readFile(__dirname + '/index.html', function (err, data) {
+		if (err) throw err;
+		var text = data.toString('utf-8')
+			.replace('{{preload}}', encodeURIComponent(JSON.stringify(compiler.files)))
+			.replace('{{scripts}}', "<script src='/" + compiler.entries.app + "'></script>");
+		res.send(text);
+	});
+});
 
 app.get('/info/:username', function (req, res) {
     db.User.findOne({where: {name: req.params.username}})
