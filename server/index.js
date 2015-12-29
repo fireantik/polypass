@@ -36,7 +36,7 @@ app.get('/', function(req, res){
 		if (err) throw err;
 		var text = data.toString('utf-8')
 			.replace('{{preload}}', encodeURIComponent(JSON.stringify(compiler.files)))
-			.replace('{{scripts}}', makeScripts(["vendor", "app"]));
+			.replace('{{scripts}}', makeScripts(["app"]));
 		res.send(text);
 	});
 });

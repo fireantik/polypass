@@ -6,11 +6,7 @@ var production = process.env.NODE_ENV == "prod" || process.env.NODE_ENV == "prod
 module.exports = {
     context: __dirname + "/client",
     entry: {
-		app: "./app.jsx",
-		vendor: [
-			"react", "react-dom", "bootstrap/less/bootstrap.less", "react-bootstrap", "react-pure-render", "react-modal",
-			"superagent", "font-awesome-webpack", "immutable", "crypto-browserify", "jsonwebtoken"
-		]
+		app: "./app.jsx"
 	},
     output: {
         path: __dirname + "/dist",
@@ -19,9 +15,7 @@ module.exports = {
         chunkFilename: "[chunkhash].js"
     },
     devtool: production ? "source-map" : "cheap-module-eval-source-map",
-    plugins: [
-		new webpack.optimize.CommonsChunkPlugin("vendor", "[chunkhash].vendor.entry.js")
-	],
+    plugins: [],
     module: {
         loaders: [
             {

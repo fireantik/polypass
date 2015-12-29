@@ -3,6 +3,7 @@
 import React from 'react';
 import PureComponent from 'react-pure-render/component';
 import {setCurrentTag, startEditingTag} from './../GlobalState.es6';
+import FA from './FontAwesome.jsx';
 
 class TagSelectorItem extends PureComponent {
 	render(){
@@ -11,7 +12,7 @@ class TagSelectorItem extends PureComponent {
 		return (
 			<div className={cls}>
 				<button className="scale" onClick={setCurrentTag.bind(null, this.props.id)}>{this.props.tag.name}</button>
-				<button onClick={startEditingTag.bind(null, this.props.id)}><i className="fa fa-pencil-square-o"/></button>
+				<button onClick={startEditingTag.bind(null, this.props.id)}><FA icon="pencil-square-o"/></button>
 			</div>
 		);
 	}

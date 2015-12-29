@@ -9,6 +9,7 @@ import {changeField, deleteRecord, setRecordTags, setTags, addRecordTag, startEd
 import CopyToClipboard from 'react-copy-to-clipboard';
 import {RecordTagSector} from './RecordTagComponent.jsx';
 import {FieldType} from '../DataTypes/index.es6';
+import FA from './FontAwesome.jsx';
 
 function capitalizeFirstLetter(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
@@ -19,7 +20,7 @@ class CopyBtn extends React.Component {
         return (
             <CopyToClipboard text={this.props.val}>
                 <Button bsStyle="info">
-                    <i className="fa fa-files-o"/> Copy
+                    <FA icon="files-o"/> Copy
                 </Button>
             </CopyToClipboard>
         );
@@ -42,7 +43,7 @@ class GenerateBtn extends React.Component {
         var pwgen = <PasswordGenerator visible={this.state.generating} onClose={_=>this.setState({generating: false})} onValue={this.onValue.bind(this)}/>;
 
         return (
-            <Button onClick={_=>this.setState({generating: true})}><i className="fa fa-magic"/> Generate{pwgen}</Button>
+            <Button onClick={_=>this.setState({generating: true})}><FA icon="magic"/> Generate{pwgen}</Button>
         );
     }
 }
@@ -73,12 +74,12 @@ class TextField extends React.Component {
 
 		if(this.props.type == "password"){
 			type = this.state.shown ? "text" : "password"
-			var showCls = "fa fa-eye" + (this.state.shown ? "-slash" : "");
+			var icon = "eye" + (this.state.shown ? "-slash" : "");
 			addons.push(<GenerateBtn key="generate" onGenerated={this.handleGenerate.bind(this)}/>);
-			addons.push(<Button key="show" onClick={x=>this.setState({shown: !this.state.shown})}><i
-				className={showCls}/> {this.state.shown ? "Hide" : "Show"}</Button>);
+			addons.push(<Button key="show" onClick={x=>this.setState({shown: !this.state.shown})}><FA
+				icon={icon}/> {this.state.shown ? "Hide" : "Show"}</Button>);
 		}
-        addons.push(<Button key="edit" onClick={startEditingField.bind(null, this.props.recordId, this.props.fieldId)}><i className="fa fa-cog"/> Edit</Button>);
+        addons.push(<Button key="edit" onClick={startEditingField.bind(null, this.props.recordId, this.props.fieldId)}><FA icon="cog"/> Edit</Button>);
         addons.push(<CopyBtn key="copy" val={field.value}/>);
 
         return (
@@ -151,11 +152,11 @@ export class RecordEditor extends React.Component {
 						{this.fields}
 
 						<ButtonGroup>
-							<Button onClick={startEditingRecord.bind(null, id)}><i className="fa fa-cog"/> Edit record</Button>
+							<Button onClick={startEditingRecord.bind(null, id)}><FA icon="cog"/> Edit record</Button>
 							<DropdownButton title="Add field" id="addNewField">
 								{fieldTypes}
 							</DropdownButton>
-							<Button bsStyle="danger" onClick={deleteRecord.bind(null, id)}><i className="fa fa-trash"/> Delete record</Button>
+							<Button bsStyle="danger" onClick={deleteRecord.bind(null, id)}><FA icon="trash"/> Delete record</Button>
 						</ButtonGroup>
 					</div>
 				</div>

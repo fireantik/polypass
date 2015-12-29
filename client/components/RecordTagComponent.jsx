@@ -5,13 +5,14 @@ import Immutable from 'immutable';
 import Crypto from './../../common/Crypto.js';
 import {Panel, Input, Button, ButtonInput, ButtonGroup} from 'react-bootstrap';
 import {setRecordTags, setTags, addRecordTag} from './../GlobalState.es6';
+import FA from './FontAwesome.jsx';
 
 class TagLabel extends React.Component {
 	render(){
 		return (
 			<span className="label label-default tag-label">
 				<button onClick={this.props.removeTag.bind(null)}>
-					<i className="fa fa-times" />
+					<FA icon="times" />
 				</button>
 				{this.props.tag.get('name')}
 			</span>
@@ -43,8 +44,8 @@ class AddTagForm extends React.Component {
 	render(){
 		if(this.state.addingTag){
 			let addons = [
-				<Button key="cancel" type="reset" bsStyle="warning" bsSize="small" onClick={this.reset.bind(this)}><i className="fa fa-times"/> Cancel</Button>,
-				<Button key="submit" type="submit" bsStyle="success" bsSize="small"><i className="fa fa-check" /> Add</Button>
+				<Button key="cancel" type="reset" bsStyle="warning" bsSize="small" onClick={this.reset.bind(this)}><FA icon="times"/> Cancel</Button>,
+				<Button key="submit" type="submit" bsStyle="success" bsSize="small"><FA icon="check"/> Add</Button>
 			];
 
 			return (

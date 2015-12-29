@@ -5,9 +5,11 @@ import PureComponent from 'react-pure-render/component';
 import {setCurrentRecord} from './../GlobalState.es6';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import {FieldType} from '../DataTypes/index.es6';
+import FA from './FontAwesome.jsx';
 
 class RecordSelectorItem extends PureComponent {
 	render(){
+		console.log("ahoj");
 		let record = this.props.record;
 
 		var cls = "custom-list-group-item" + (this.props.active ? " active" : "");
@@ -18,7 +20,7 @@ class RecordSelectorItem extends PureComponent {
 		if(pwField){
 			copyBtn = (
 				<CopyToClipboard text={pwField.value}>
-					<button><i className="fa fa-files-o"/></button>
+					<button><FA icon="files-o"/></button>
 				</CopyToClipboard>
 			);
 		}
