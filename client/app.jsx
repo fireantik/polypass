@@ -3,7 +3,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {App} from './components/App.jsx';
-import {emitter, setInitialState, setTestState} from './GlobalState.es6';
+import {emitter, setInitialState, setTestState, urlChanged} from './GlobalState.es6';
 require('bootstrap/less/bootstrap.less');
 require('../style/style.less');
 
@@ -14,5 +14,8 @@ emitter.on('new state', function(state) {
 	);
 });
 
-if(window.location.hash == "#test") setTestState();
-else setInitialState();
+
+
+window.addEventListener('hashchange', urlChanged);
+
+setInitialState();

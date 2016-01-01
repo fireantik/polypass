@@ -18,8 +18,12 @@ export function setState(newState){
 		saveDataTimeout = setTimeout(uploadMainBlock, 200, newState.data);
 	}
 
+	var doUpdateUrl = state && state.state != newState.state;
+
 	state = newState;
 	emitter.emit("new state", state);
+
+	if(doUpdateUrl) setTimeout(updateUrl, 1);
 }
 
 export function setInitialState(){
@@ -115,6 +119,7 @@ export function api_login(password){
 			let str = new Buffer(lean).toString('utf-8');
 			let masterData = new MasterStateData(JSON.parse(str));
 			setData(masterData);
+			urlChanged();
 			changeApi({state: ApiState.ready});
 		})
 	}, _ => changeApi({state: ApiState.passwordInvalid}));
@@ -161,6 +166,7 @@ export function api_register(password) {
 		return register(state.api.username, state.api.crypto, state.api.cert);
 	}).then(data => {
 		setData(generateMasterData());
+		urlChanged();
 		changeApi({state: ApiState.ready, uid: data.uid});
 	});
 }
@@ -348,4 +354,86 @@ export function addField(recordId, type){
 	let st = state.setIn(['data', 'records', recordId, 'fields', id], field);
 	setState(st);
 	startEditingField(recordId, id);
+}
+
+export function urlChanged(){
+	let map = window.location.hash
+		.substring(1)
+		.split('&')
+		.map(x=>x.split('='))
+		.reduce((hash, [key, value]) => {
+			hash[key] = value;
+			return hash;
+		}, {});
+
+	urlHashChanged(map);
+}
+
+function urlHashChanged(hashMap){
+	var record = null;
+	var tag = null;
+	var field = null;
+	var type = EditingType.record;
+
+	if(state.data.tags.has(hashMap.tag)){
+		tag = hashMap.tag;
+
+		if(hashMap.type == EditingType.tag){
+			type = hashMap.type;
+		}
+	}
+	if(type != EditingType.tag && state.data.records.has(hashMap.record)){
+		record = hashMap.record;
+
+		if(hashMap.type == EditingType.recordStructure){
+			type = hashMap.type;
+		}
+		else if(state.data.records.get(record).fields.has(hashMap.field)){
+			field = hashMap.fields;
+
+			if(hashMap.type == EditingType.field){
+				type = hashMap.type;
+			}
+		}
+	}
+
+	let obj = {
+		currentRecord: record,
+		currentField: field,
+		currentTag: tag,
+		editingType: type
+	};
+
+	let st = state.state;
+
+	if(
+		st.currentRecord != record
+		|| st.currentField != field
+		|| st.currentTag != tag
+		|| st.editingType != type
+	) {
+		changeMainState(obj);
+	}
+}
+
+export function updateUrl(){
+	let map = {
+		type: state.state.editingType,
+		tag: state.state.currentTag,
+		record: state.state.currentRecord,
+		field: state.state.currentField
+	};
+
+	var str = "";
+	var first = true;
+	for(var i in map){
+		if(!map[i]) continue;
+
+		if(first) first = false;
+		else str += "&";
+
+		str += i + "=" + map[i];
+	}
+
+	window.location.hash = "#" + str;
 }

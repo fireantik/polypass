@@ -9,7 +9,6 @@ import FA from './FontAwesome.jsx';
 
 class RecordSelectorItem extends PureComponent {
 	render(){
-		console.log("ahoj");
 		let record = this.props.record;
 
 		var cls = "custom-list-group-item" + (this.props.active ? " active" : "");
