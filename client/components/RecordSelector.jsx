@@ -43,7 +43,7 @@ export class RecordSelector extends PureComponent {
 			.toArray();
 
 		return (
-			<div id="record-list-tab" className="tab">
+			<div id="record-list-tab" className={"col-md-3 col-sm-4" + (this.props.active ? " active" : "")}>
 				<div className="custom-list-group">
 					{records}
 				</div>

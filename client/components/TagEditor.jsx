@@ -16,7 +16,7 @@ export class TagEditor extends React.Component {
 		setTag(this.props.tagId, tag);
 	}
 
-	get nameEditor(){
+	render() {
 		var label = "Tag name";
 		var style = undefined;
 
@@ -36,14 +36,6 @@ export class TagEditor extends React.Component {
 			placeholder="Tag name"
 			hasFeedback
 			onChange={this.handleChange.bind(this)}
-		/>;
-	}
-
-	render() {
-		return (
-			<div id="record-tab" className="tab">
-				{this.nameEditor}
-			</div>
-		);
+		/>
 	}
 }

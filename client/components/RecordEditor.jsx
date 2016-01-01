@@ -138,27 +138,25 @@ export class RecordEditor extends React.Component {
 		let fieldTypes = Object.keys(FieldType).map(x=>FieldType[x]).map(t => <MenuItem eventKey={t} key={t} onSelect={addField.bind(null, id, t)}>{capitalizeFirstLetter(t)}</MenuItem>)
 
 		return (
-			<div id="record-tab" className="tab">
-				<div className="panel panel-default">
-					<div className="panel-heading" id="record-header">
-						<h3 className="panel-title">{record.name}</h3>
-						<RecordTagSector
-							tags={this.props.tags}
-							recordTags={record.tags}
-							recordId={id}
-						/>
-					</div>
-					<div className="panel-body">
-						{this.fields}
+			<div className="panel panel-default">
+				<div className="panel-heading" id="record-header">
+					<h3 className="panel-title">{record.name}</h3>
+					<RecordTagSector
+						tags={this.props.tags}
+						recordTags={record.tags}
+						recordId={id}
+					/>
+				</div>
+				<div className="panel-body">
+					{this.fields}
 
-						<ButtonGroup>
-							<Button onClick={startEditingRecord.bind(null, id)}><FA icon="cog"/> Edit record</Button>
-							<DropdownButton title="Add field" id="addNewField">
-								{fieldTypes}
-							</DropdownButton>
-							<Button bsStyle="danger" onClick={deleteRecord.bind(null, id)}><FA icon="trash"/> Delete record</Button>
-						</ButtonGroup>
-					</div>
+					<ButtonGroup>
+						<Button onClick={startEditingRecord.bind(null, id)}><FA icon="cog"/> Edit record</Button>
+						<DropdownButton title="Add field" id="addNewField">
+							{fieldTypes}
+						</DropdownButton>
+						<Button bsStyle="danger" onClick={deleteRecord.bind(null, id)}><FA icon="trash"/> Delete record</Button>
+					</ButtonGroup>
 				</div>
 			</div>
 		);

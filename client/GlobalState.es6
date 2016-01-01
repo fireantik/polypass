@@ -1,6 +1,6 @@
 "use strict";
 
-import {MasterState, MasterStateData, ApiState, Tag, EditingType, State, Api, Record, Field, FieldType} from './DataTypes/index.es6';
+import {MasterState, MasterStateData, ApiState, Tag, EditingType, ShowType, State, Api, Record, Field, FieldType} from './DataTypes/index.es6';
 import EventEmitter from 'events';
 import {getInfo, decryptPriv, genKey, register, readBlock, putBlock} from './Api.es6';
 var Block = require('./Block.js');
@@ -374,6 +374,7 @@ function urlHashChanged(hashMap){
 	var tag = null;
 	var field = null;
 	var type = EditingType.record;
+	var showType = ShowType.editor;
 
 	if(state.data.tags.has(hashMap.tag)){
 		tag = hashMap.tag;
@@ -396,12 +397,14 @@ function urlHashChanged(hashMap){
 			}
 		}
 	}
+	if(hashMap.showType == ShowType.editor || hashMap.showType == ShowType.records || hashMap.showType == ShowType.tags) showType = hashMap.showType;
 
 	let obj = {
 		currentRecord: record,
 		currentField: field,
 		currentTag: tag,
-		editingType: type
+		editingType: type,
+		showType: showType
 	};
 
 	let st = state.state;
@@ -411,29 +414,12 @@ function urlHashChanged(hashMap){
 		|| st.currentField != field
 		|| st.currentTag != tag
 		|| st.editingType != type
+		|| st.showType != showType
 	) {
 		changeMainState(obj);
 	}
 }
 
 export function updateUrl(){
-	let map = {
-		type: state.state.editingType,
-		tag: state.state.currentTag,
-		record: state.state.currentRecord,
-		field: state.state.currentField
-	};
-
-	var str = "";
-	var first = true;
-	for(var i in map){
-		if(!map[i]) continue;
-
-		if(first) first = false;
-		else str += "&";
-
-		str += i + "=" + map[i];
-	}
-
-	window.location.hash = "#" + str;
+	window.location.hash = state.state.urlHash;
 }

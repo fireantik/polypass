@@ -26,18 +26,16 @@ export class RecordStructureEditor extends React.Component {
 	render() {
 		let record = this.props.record;
 		return (
-			<div id="record-tab" className="tab">
-				<Panel header="Edit record">
-					<form onSubmit={this.handleSubmit.bind(this)} onReset={this.handleReset.bind(this)}>
-						<Input type="text" label="Id" value={this.props.id} disabled/>
-						<Input ref="name" type="text" label="Name" defaultValue={record.name}/>
-						<ButtonGroup>
-							<Button type="reset">Cancel</Button>
-							<Button type="submit" bsStyle="success">Save</Button>
-						</ButtonGroup>
-					</form>
-				</Panel>
-			</div>
+			<Panel header="Edit record">
+				<form onSubmit={this.handleSubmit.bind(this)} onReset={this.handleReset.bind(this)}>
+					<Input type="text" label="Id" value={this.props.id} disabled/>
+					<Input ref="name" type="text" label="Name" defaultValue={record.name}/>
+					<ButtonGroup>
+						<Button type="reset">Cancel</Button>
+						<Button type="submit" bsStyle="success">Save</Button>
+					</ButtonGroup>
+				</form>
+			</Panel>
 		);
 	}
 }

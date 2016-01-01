@@ -37,22 +37,20 @@ export class FieldEditor extends React.Component {
 		let types = Object.keys(FieldType).map(x=>FieldType[x]).map(t => <option key={t} value={t}>{capitalizeFirstLetter(t)}</option>)
 
 		return (
-			<div id="record-tab" className="tab">
-				<Panel header="Edit field">
-					<form onSubmit={this.handleSubmit.bind(this)} onReset={this.handleReset.bind(this)}>
-						<Input type="text" label="Id" value={this.props.fieldId} disabled/>
-						<Input ref="name" type="text" label="Name" defaultValue={field.name}/>
-						<Input ref="type" type="select" label="Type" defaultValue={field.type}>
-							{types}
-						</Input>
-						<ButtonGroup>
-							<Button bsStyle="danger" onClick={this.handleDelete.bind(this)}>Delete field</Button>
-							<Button type="reset">Cancel</Button>
-							<Button type="submit" bsStyle="success">Save</Button>
-						</ButtonGroup>
-					</form>
-				</Panel>
-			</div>
+			<Panel header="Edit field">
+				<form onSubmit={this.handleSubmit.bind(this)} onReset={this.handleReset.bind(this)}>
+					<Input type="text" label="Id" value={this.props.fieldId} disabled/>
+					<Input ref="name" type="text" label="Name" defaultValue={field.name}/>
+					<Input ref="type" type="select" label="Type" defaultValue={field.type}>
+						{types}
+					</Input>
+					<ButtonGroup>
+						<Button bsStyle="danger" onClick={this.handleDelete.bind(this)}>Delete field</Button>
+						<Button type="reset">Cancel</Button>
+						<Button type="submit" bsStyle="success">Save</Button>
+					</ButtonGroup>
+				</form>
+			</Panel>
 		);
 	}
 }

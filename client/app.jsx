@@ -18,4 +18,10 @@ emitter.on('new state', function(state) {
 
 window.addEventListener('hashchange', urlChanged);
 
-setInitialState();
+if(window.location.hash == "#test") {
+	setTestState();
+}
+else {
+	setInitialState();
+}
+
