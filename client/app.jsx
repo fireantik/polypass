@@ -2,10 +2,10 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {App} from 'Components/App.jsx';
+import {App} from './Components/App.jsx';
 import {emitter, setInitialState, setTestState, urlChanged} from './GlobalState.es6';
-require('bootstrap/less/bootstrap.less');
-require('../style/style.less');
+import 'bootstrap/less/bootstrap.less';
+import '../style/style.less';
 
 emitter.on('new state', function (state) {
 	ReactDOM.render(
