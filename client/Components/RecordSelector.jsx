@@ -8,7 +8,7 @@ import {FieldType} from '../DataTypes/index.es6';
 import FA from './FontAwesome.jsx';
 
 class RecordSelectorItem extends PureComponent {
-	render(){
+	render() {
 		let record = this.props.record;
 
 		var cls = "custom-list-group-item" + (this.props.active ? " active" : "");
@@ -16,7 +16,7 @@ class RecordSelectorItem extends PureComponent {
 		var copyBtn = false;
 
 		let pwField = record.fields.find(x=>x.type == FieldType.password);
-		if(pwField){
+		if (pwField) {
 			copyBtn = (
 				<CopyToClipboard text={pwField.value}>
 					<button><FA icon="files-o"/></button>
@@ -34,12 +34,13 @@ class RecordSelectorItem extends PureComponent {
 }
 
 export class RecordSelector extends PureComponent {
-	render(){
+	render() {
 		let activeRecords = this.props.currentTag ? this.props.records.filter(val => val.tags.contains(this.props.currentTag)) : this.props.records;
 
 		let records = activeRecords
 			.sortBy(val => val.name.toLowerCase())
-			.map((record, key) => <RecordSelectorItem active={this.props.currentRecord == key} key={key} id={key} record={record}/>)
+			.map((record, key) => <RecordSelectorItem active={this.props.currentRecord == key} key={key} id={key}
+													  record={record}/>)
 			.toArray();
 
 		return (

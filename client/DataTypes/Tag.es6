@@ -18,19 +18,19 @@ export class Tag extends MakeClass({
 	/**
 	 * @param {Object} [data]
 	 */
-	static fromJS(data){
-		if(typeof data != "object") return new Tag();
+	static fromJS(data) {
+		if (typeof data != "object") return new Tag();
 
 		var x = {
 			lastChange: Date.now(),
 			name: ""
 		};
 
-		if(typeof data.lastChange == "number"){
+		if (typeof data.lastChange == "number") {
 			x.lastChange = data.lastChange;
 		}
 
-		if(typeof data.name == "string"){
+		if (typeof data.name == "string") {
 			x.name = data.name;
 		}
 

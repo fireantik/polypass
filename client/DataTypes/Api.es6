@@ -38,7 +38,7 @@ export class Api extends MakeClass({
 	salt: null,
 	uid: null
 }) {
-	get cert(){
+	get cert() {
 		return {pub: this.publicKey, priv: this.privateKey};
 	}
 }

@@ -22,8 +22,8 @@ export class MasterStateData extends MakeClass({
 	/**
 	 * @param {Object} [data]
 	 */
-	constructor(data){
-		if(typeof data != "object") return super({});
+	constructor(data) {
+		if (typeof data != "object") return super({});
 
 		var x = {
 			lastChange: Date.now(),
@@ -31,18 +31,18 @@ export class MasterStateData extends MakeClass({
 			tags: {}
 		};
 
-		if(typeof data.lastChange == "number"){
+		if (typeof data.lastChange == "number") {
 			x.lastChange = data.lastChange;
 		}
 
-		if(typeof data.records == "object"){
-			for(let key in data.records){
+		if (typeof data.records == "object") {
+			for (let key in data.records) {
 				x.records[key] = Record.fromJS(data.records[key]);
 			}
 		}
 
-		if(typeof data.tags == "object"){
-			for(let key in data.tags){
+		if (typeof data.tags == "object") {
+			for (let key in data.tags) {
 				x.tags[key] = Tag.fromJS(data.tags[key]);
 			}
 		}

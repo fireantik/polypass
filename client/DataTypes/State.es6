@@ -48,7 +48,7 @@ export class State extends MakeClass({
 	editingType: EditingType.record,
 	showType: ShowType.editor
 }) {
-	get urlHash(){
+	get urlHash() {
 		let map = {
 			type: this.editingType,
 			showType: this.showType,
@@ -59,10 +59,10 @@ export class State extends MakeClass({
 
 		var str = "#";
 		var first = true;
-		for(var i in map){
-			if(!map[i]) continue;
+		for (var i in map) {
+			if (!map[i]) continue;
 
-			if(first) first = false;
+			if (first) first = false;
 			else str += "&";
 
 			str += i + "=" + map[i];
@@ -71,7 +71,7 @@ export class State extends MakeClass({
 		return str;
 	}
 
-	makeShowLink(type){
+	makeShowLink(type) {
 		return this.set('showType', type).urlHash;
 	}
 }

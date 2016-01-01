@@ -10,7 +10,7 @@ function capitalizeFirstLetter(string) {
 }
 
 export class FieldEditor extends React.Component {
-	handleSubmit(e){
+	handleSubmit(e) {
 		e.preventDefault();
 
 		let field = this.props.field.Set({
@@ -22,19 +22,20 @@ export class FieldEditor extends React.Component {
 		doneEditingField();
 	}
 
-	handleReset(e){
+	handleReset(e) {
 		e.preventDefault();
 		doneEditingField();
 	}
 
-	handleDelete(){
+	handleDelete() {
 		deleteField(this.props.recordId, this.props.fieldId);
 		doneEditingField();
 	}
 
 	render() {
 		let field = this.props.field;
-		let types = Object.keys(FieldType).map(x=>FieldType[x]).map(t => <option key={t} value={t}>{capitalizeFirstLetter(t)}</option>)
+		let types = Object.keys(FieldType).map(x=>FieldType[x]).map(t => <option key={t}
+																				 value={t}>{capitalizeFirstLetter(t)}</option>)
 
 		return (
 			<Panel header="Edit field">

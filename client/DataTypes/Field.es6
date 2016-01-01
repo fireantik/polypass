@@ -29,7 +29,7 @@ export class Field extends MakeClass({
 	type: "text",
 	value: ""
 }) {
-	constructor(props){
+	constructor(props) {
 		super(props);
 	}
 
@@ -37,8 +37,8 @@ export class Field extends MakeClass({
 	 * @param {Object} [data]
 	 * @return {Field}
 	 */
-	static fromJS(data){
-		if(typeof data != "object") return new Field();
+	static fromJS(data) {
+		if (typeof data != "object") return new Field();
 
 		var x = {
 			lastChange: Date.now(),
@@ -47,19 +47,19 @@ export class Field extends MakeClass({
 			value: ""
 		};
 
-		if(typeof data.lastChange == "number"){
+		if (typeof data.lastChange == "number") {
 			x.lastChange = data.lastChange;
 		}
 
-		if(typeof data.name == "string"){
+		if (typeof data.name == "string") {
 			x.name = data.name;
 		}
 
-		if(typeof data.type == "string"){
+		if (typeof data.type == "string") {
 			x.type = data.type;
 		}
 
-		if(typeof data.value == "string"){
+		if (typeof data.value == "string") {
 			x.value = data.value;
 		}
 

@@ -8,7 +8,7 @@ import {setTag, doneEditingTag} from './../GlobalState.es6';
 import { Input, ButtonInput, Panel } from 'react-bootstrap';
 
 export class TagEditor extends React.Component {
-	handleChange(){
+	handleChange() {
 		let tag = this.props.tag.Set({
 			name: this.refs.name.getValue()
 		});
@@ -22,7 +22,7 @@ export class TagEditor extends React.Component {
 
 		let name = this.props.tag.name;
 		let cnt = this.props.tags.count(t => t.name == name);
-		if(cnt != 1){
+		if (cnt != 1) {
 			label = `Tag name - There are ${cnt} tags with this name`;
 			style = "warning";
 		}

@@ -6,12 +6,13 @@ import {setCurrentTag, startEditingTag} from './../GlobalState.es6';
 import FA from './FontAwesome.jsx';
 
 class TagSelectorItem extends PureComponent {
-	render(){
+	render() {
 		var cls = "custom-list-group-item" + (this.props.active ? " active" : "");
 
 		return (
 			<div className={cls}>
-				<button className="scale" onClick={setCurrentTag.bind(null, this.props.id)}>{this.props.tag.name}</button>
+				<button className="scale"
+						onClick={setCurrentTag.bind(null, this.props.id)}>{this.props.tag.name}</button>
 				<button onClick={startEditingTag.bind(null, this.props.id)}><FA icon="pencil-square-o"/></button>
 			</div>
 		);
@@ -19,7 +20,7 @@ class TagSelectorItem extends PureComponent {
 }
 
 export class TagSelector extends PureComponent {
-	render(){
+	render() {
 		let tags = this.props.tags
 			.sortBy(x => x.name.toLowerCase())
 			.map((tag, id) => <TagSelectorItem

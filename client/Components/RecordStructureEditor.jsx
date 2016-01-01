@@ -5,7 +5,7 @@ import {Panel, Input, ButtonGroup, Button} from 'react-bootstrap';
 import {doneEditingRecord, setRecord} from '../GlobalState.es6';
 
 export class RecordStructureEditor extends React.Component {
-	handleSubmit(e){
+	handleSubmit(e) {
 		e.preventDefault();
 
 		let record = this.props.record.Set({
@@ -17,7 +17,7 @@ export class RecordStructureEditor extends React.Component {
 		doneEditingRecord();
 	}
 
-	handleReset(e){
+	handleReset(e) {
 		e.preventDefault();
 		doneEditingRecord();
 	}

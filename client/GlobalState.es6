@@ -10,11 +10,11 @@ var state = null;
 var saveDataTimeout = null;
 export const emitter = new EventEmitter();
 
-export function setState(newState){
-	if(state && state.data != newState.data){
+export function setState(newState) {
+	if (state && state.data != newState.data) {
 		changeMainState({unsavedChanges: true});
 
-		if(saveDataTimeout) clearTimeout(saveDataTimeout);
+		if (saveDataTimeout) clearTimeout(saveDataTimeout);
 		saveDataTimeout = setTimeout(uploadMainBlock, 200, newState.data);
 	}
 
@@ -23,14 +23,14 @@ export function setState(newState){
 	state = newState;
 	emitter.emit("new state", state);
 
-	if(doUpdateUrl) setTimeout(updateUrl, 1);
+	if (doUpdateUrl) setTimeout(updateUrl, 1);
 }
 
-export function setInitialState(){
+export function setInitialState() {
 	setState(new MasterState());
 }
 
-export function setTestState(){
+export function setTestState() {
 	let data = generateMasterData();
 	let st = new State({
 		username: "Testicek",
@@ -46,49 +46,49 @@ export function setTestState(){
 	}));
 }
 
-export function uploadMainBlock(data){
+export function uploadMainBlock(data) {
 	console.log("uploading...", data.toJS());
-	if(state.test) return;
+	if (state.test) return;
 
 	saveDataTimeout = null;
 	let str = JSON.stringify(data.toJS());
 	let block = new Block(state.api.crypto);
 	block.setLean(new Buffer(str));
 	putBlock(state.api.uid, 0, block, state.api.privateKey)
-	.then(_ => {
-		if(data == state.data) changeMainState({unsavedChanges: false});
-	});
+		.then(_ => {
+			if (data == state.data) changeMainState({unsavedChanges: false});
+		});
 }
 
-export function setData(data){
-	setState(state.Set({data:  data}));
+export function setData(data) {
+	setState(state.Set({data: data}));
 }
 
-export function changeMainState(changes){
+export function changeMainState(changes) {
 	setState(state.Set({state: state.state.Set(changes)}));
 }
 
-export function loadData(jsData){
+export function loadData(jsData) {
 	setData(new MasterStateData(jsData));
 }
 
-export function setApi(api){
-	setState(state.Set({api:  api}));
+export function setApi(api) {
+	setState(state.Set({api: api}));
 }
 
-export function changeApi(changes){
+export function changeApi(changes) {
 	setApi(state.api.Set(changes));
 }
 
-export function api_setUsername(username){
-	if(state.api.state != ApiState.askUsername) throw new Error("Invalid state");
+export function api_setUsername(username) {
+	if (state.api.state != ApiState.askUsername) throw new Error("Invalid state");
 
 	changeApi({username: username, state: ApiState.working});
 
 	getInfo(username).then(info => {
-		if(username != state.api.username) return; //username has been changed, this is no longer relevant
+		if (username != state.api.username) return; //username has been changed, this is no longer relevant
 
-		if(info.error) return changeApi({state: ApiState.askRegisterPassword});
+		if (info.error) return changeApi({state: ApiState.askRegisterPassword});
 
 		changeApi({
 			state: ApiState.askLoginPassword,
@@ -100,8 +100,8 @@ export function api_setUsername(username){
 	});
 }
 
-export function api_login(password){
-	if(state.api.state != ApiState.askLoginPassword && state.api.state != ApiState.passwordInvalid) throw new Error("Invalid state");
+export function api_login(password) {
+	if (state.api.state != ApiState.askLoginPassword && state.api.state != ApiState.passwordInvalid) throw new Error("Invalid state");
 
 	changeApi({state: ApiState.working});
 	let tmp_crypto = new Crypto(password, state.api.salt);
@@ -125,7 +125,7 @@ export function api_login(password){
 	}, _ => changeApi({state: ApiState.passwordInvalid}));
 }
 
-function generateMasterData(){
+function generateMasterData() {
 	function getFields(add) {
 		var x = {};
 		x[Crypto.randomId()] = {name: "username", type: FieldType.text, value: "Napoleon" + add};
@@ -171,20 +171,20 @@ export function api_register(password) {
 	});
 }
 
-export function setCurrentTag(tagId){
+export function setCurrentTag(tagId) {
 	changeMainState({currentTag: tagId});
 }
 
-export function setCurrentRecord(recordId){
+export function setCurrentRecord(recordId) {
 	changeMainState({currentRecord: recordId, editingType: EditingType.record});
 }
 
-export function changeField(recordId, fieldId, field){
+export function changeField(recordId, fieldId, field) {
 	let newState = state.setIn(['data', 'records', recordId, 'fields', fieldId], field);
 	setState(newState);
 }
 
-export function deleteRecord(recordId){
+export function deleteRecord(recordId) {
 	let newState = state
 		.deleteIn(['data', 'records', recordId])
 		.setIn(['state', 'currentRecord'], null);
@@ -192,20 +192,20 @@ export function deleteRecord(recordId){
 	setState(newState);
 }
 
-export function setRecordTags(recordId, tags){
+export function setRecordTags(recordId, tags) {
 	let newState = state.setIn(['data', 'records', recordId, 'tags'], tags);
 	setState(newState);
 }
 
-export function setTags(tags){
+export function setTags(tags) {
 	let newState = state.setIn(['data', 'tags'], tags);
 	setState(newState);
 }
 
-export function addRecordTag(recordId, tagName){
+export function addRecordTag(recordId, tagName) {
 	var key = state.data.tags.findKey(t => t.name == tagName);
 
-	if(!key) {
+	if (!key) {
 		let tag = new Tag({name: tagName});
 		key = Crypto.randomId();
 		setTags(state.data.tags.set(key, tag));
@@ -215,26 +215,26 @@ export function addRecordTag(recordId, tagName){
 	setRecordTags(recordId, record.tags.add(key));
 }
 
-export function startEditingTag(tagId){
+export function startEditingTag(tagId) {
 	changeMainState({currentTag: tagId, currentRecord: null, editingType: EditingType.tag});
 }
 
-export function doneEditingTag(){
+export function doneEditingTag() {
 	changeMainState({editingType: EditingType.record});
 }
 
-export function setTag(tagId, tag){
+export function setTag(tagId, tag) {
 	setTags(state.data.tags.set(tagId, tag));
 }
 
-export function startEditingField(recordId, fieldId){
+export function startEditingField(recordId, fieldId) {
 	changeMainState({currentRecord: recordId, currentField: fieldId, editingType: EditingType.field});
 }
-export function doneEditingField(){
+export function doneEditingField() {
 	changeMainState({editingType: EditingType.record, currentField: null});
 }
 
-export function deleteField(recordId, fieldId){
+export function deleteField(recordId, fieldId) {
 	let st = state.deleteIn(['data', 'records', recordId, 'fields', fieldId]);
 	setState(st);
 }
@@ -250,14 +250,14 @@ export const NewRecordType = {
 	keypair: "KEYPAIR"
 };
 
-function createNewRecord_keypair(){
+function createNewRecord_keypair() {
 	return Record.fromJS({
 		name: "Record name",
 		fields: {}
 	});
 }
 
-function createNewRecord_website(email){
+function createNewRecord_website(email) {
 	var fields = {};
 
 	fields[Crypto.randomId()] = {
@@ -281,7 +281,7 @@ function createNewRecord_website(email){
 	});
 }
 
-function createNewRecord_simple(){
+function createNewRecord_simple() {
 	var fields = {};
 
 	fields[Crypto.randomId()] = {
@@ -304,9 +304,9 @@ function createNewRecord_simple(){
  *
  * @param {NewRecordType} type
  */
-export function createNewRecord(type){
+export function createNewRecord(type) {
 	let record;
-	switch (type){
+	switch (type) {
 		case NewRecordType.web_email:
 			record = createNewRecord_website(true);
 			break;
@@ -327,16 +327,16 @@ export function createNewRecord(type){
 	startEditingRecord(id);
 }
 
-export function setRecord(recordId, record){
+export function setRecord(recordId, record) {
 	let st = state.setIn(['data', 'records', recordId], record);
 	setState(st);
 }
 
-export function startEditingRecord(recordId){
+export function startEditingRecord(recordId) {
 	changeMainState({currentRecord: recordId, currentField: null, editingType: EditingType.recordStructure});
 }
 
-export function doneEditingRecord(){
+export function doneEditingRecord() {
 	changeMainState({editingType: EditingType.record});
 }
 
@@ -345,7 +345,7 @@ export function doneEditingRecord(){
  *
  * @param {FieldType} type
  */
-export function addField(recordId, type){
+export function addField(recordId, type) {
 	let field = Field.fromJS({
 		type: type
 	});
@@ -356,7 +356,7 @@ export function addField(recordId, type){
 	startEditingField(recordId, id);
 }
 
-export function urlChanged(){
+export function urlChanged() {
 	let map = window.location.hash
 		.substring(1)
 		.split('&')
@@ -369,35 +369,35 @@ export function urlChanged(){
 	urlHashChanged(map);
 }
 
-function urlHashChanged(hashMap){
+function urlHashChanged(hashMap) {
 	var record = null;
 	var tag = null;
 	var field = null;
 	var type = EditingType.record;
 	var showType = ShowType.editor;
 
-	if(state.data.tags.has(hashMap.tag)){
+	if (state.data.tags.has(hashMap.tag)) {
 		tag = hashMap.tag;
 
-		if(hashMap.type == EditingType.tag){
+		if (hashMap.type == EditingType.tag) {
 			type = hashMap.type;
 		}
 	}
-	if(type != EditingType.tag && state.data.records.has(hashMap.record)){
+	if (type != EditingType.tag && state.data.records.has(hashMap.record)) {
 		record = hashMap.record;
 
-		if(hashMap.type == EditingType.recordStructure){
+		if (hashMap.type == EditingType.recordStructure) {
 			type = hashMap.type;
 		}
-		else if(state.data.records.get(record).fields.has(hashMap.field)){
+		else if (state.data.records.get(record).fields.has(hashMap.field)) {
 			field = hashMap.fields;
 
-			if(hashMap.type == EditingType.field){
+			if (hashMap.type == EditingType.field) {
 				type = hashMap.type;
 			}
 		}
 	}
-	if(hashMap.showType == ShowType.editor || hashMap.showType == ShowType.records || hashMap.showType == ShowType.tags) showType = hashMap.showType;
+	if (hashMap.showType == ShowType.editor || hashMap.showType == ShowType.records || hashMap.showType == ShowType.tags) showType = hashMap.showType;
 
 	let obj = {
 		currentRecord: record,
@@ -409,7 +409,7 @@ function urlHashChanged(hashMap){
 
 	let st = state.state;
 
-	if(
+	if (
 		st.currentRecord != record
 		|| st.currentField != field
 		|| st.currentTag != tag
@@ -420,6 +420,6 @@ function urlHashChanged(hashMap){
 	}
 }
 
-export function updateUrl(){
+export function updateUrl() {
 	window.location.hash = state.state.urlHash;
 }

@@ -8,11 +8,11 @@ import {setRecordTags, setTags, addRecordTag} from './../GlobalState.es6';
 import FA from './FontAwesome.jsx';
 
 class TagLabel extends React.Component {
-	render(){
+	render() {
 		return (
 			<span className="label label-default tag-label">
 				<button onClick={this.props.removeTag.bind(null)}>
-					<FA icon="times" />
+					<FA icon="times"/>
 				</button>
 				{this.props.tag.get('name')}
 			</span>
@@ -21,18 +21,18 @@ class TagLabel extends React.Component {
 }
 
 class AddTagForm extends React.Component {
-	constructor(props){
+	constructor(props) {
 		super(props);
 		this.state = {
 			addingTag: false
 		};
 	}
 
-	reset(){
+	reset() {
 		this.setState({addingTag: false, value: ""});
 	}
 
-	handleSubmit(e){
+	handleSubmit(e) {
 		e.preventDefault();
 		let name = this.refs.tag.value;
 
@@ -41,10 +41,11 @@ class AddTagForm extends React.Component {
 		this.reset();
 	}
 
-	render(){
-		if(this.state.addingTag){
+	render() {
+		if (this.state.addingTag) {
 			let addons = [
-				<Button key="cancel" type="reset" bsStyle="warning" bsSize="small" onClick={this.reset.bind(this)}><FA icon="times"/> Cancel</Button>,
+				<Button key="cancel" type="reset" bsStyle="warning" bsSize="small" onClick={this.reset.bind(this)}><FA
+					icon="times"/> Cancel</Button>,
 				<Button key="submit" type="submit" bsStyle="success" bsSize="small"><FA icon="check"/> Add</Button>
 			];
 
@@ -60,19 +61,20 @@ class AddTagForm extends React.Component {
 			);
 		}
 		else {
-			return <button className="label label-primary" onClick={x=>this.setState({addingTag: true})}>Add tag</button>;
+			return <button className="label label-primary" onClick={x=>this.setState({addingTag: true})}>Add
+				tag</button>;
 		}
 	}
 }
 
 export class RecordTagSector extends React.Component {
-	removeTag(tagId){
+	removeTag(tagId) {
 		let tags = Immutable.Set(this.props.recordTags).delete(tagId);
 
 		setRecordTags(this.props.recordId, tags);
 	}
 
-	render(){
+	render() {
 		let tags = this.props.tags
 			.filter((_, key) => this.props.recordTags.contains(key))
 			.map((t, key) => <TagLabel

@@ -7,7 +7,7 @@ import {emitter, setInitialState, setTestState, urlChanged} from './GlobalState.
 require('bootstrap/less/bootstrap.less');
 require('../style/style.less');
 
-emitter.on('new state', function(state) {
+emitter.on('new state', function (state) {
 	ReactDOM.render(
 		<App state={state}/>,
 		document.getElementById('appContainer')
@@ -15,10 +15,9 @@ emitter.on('new state', function(state) {
 });
 
 
-
 window.addEventListener('hashchange', urlChanged);
 
-if(window.location.hash == "#test") {
+if (window.location.hash == "#test") {
 	setTestState();
 }
 else {

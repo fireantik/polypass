@@ -16,91 +16,94 @@ function capitalizeFirstLetter(string) {
 }
 
 class CopyBtn extends React.Component {
-    render() {
-        return (
-            <CopyToClipboard text={this.props.val}>
-                <Button bsStyle="info">
-                    <FA icon="files-o"/> Copy
-                </Button>
-            </CopyToClipboard>
-        );
-    }
+	render() {
+		return (
+			<CopyToClipboard text={this.props.val}>
+				<Button bsStyle="info">
+					<FA icon="files-o"/> Copy
+				</Button>
+			</CopyToClipboard>
+		);
+	}
 }
 
 
 class GenerateBtn extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {generating: false};
-    }
+	constructor(props) {
+		super(props);
+		this.state = {generating: false};
+	}
 
-    onValue(x) {
-        this.setState({generating: false});
-        this.props.onGenerated(x);
-    }
+	onValue(x) {
+		this.setState({generating: false});
+		this.props.onGenerated(x);
+	}
 
-    render() {
-        var pwgen = <PasswordGenerator visible={this.state.generating} onClose={_=>this.setState({generating: false})} onValue={this.onValue.bind(this)}/>;
+	render() {
+		var pwgen = <PasswordGenerator visible={this.state.generating} onClose={_=>this.setState({generating: false})}
+									   onValue={this.onValue.bind(this)}/>;
 
-        return (
-            <Button onClick={_=>this.setState({generating: true})}><FA icon="magic"/> Generate{pwgen}</Button>
-        );
-    }
+		return (
+			<Button onClick={_=>this.setState({generating: true})}><FA icon="magic"/> Generate{pwgen}</Button>
+		);
+	}
 }
 
 class TextField extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {shown: false};
-    }
+	constructor(props) {
+		super(props);
+		this.state = {shown: false};
+	}
 
-    handleGenerate(x) {
+	handleGenerate(x) {
 		let field = this.props.field.set('value', x);
-        this.props.onChange(field);
-    }
+		this.props.onChange(field);
+	}
 
-    handleChange() {
+	handleChange() {
 		let val = this.refs.input.getValue();
 		let field = this.props.field.set('value', val);
 		this.props.onChange(field);
-    }
+	}
 
-    render() {
-        let field = this.props.field;
-        var type = this.props.type;
+	render() {
+		let field = this.props.field;
+		var type = this.props.type;
 
-        var addons = [];
+		var addons = [];
 
 
-		if(this.props.type == "password"){
+		if (this.props.type == "password") {
 			type = this.state.shown ? "text" : "password"
 			var icon = "eye" + (this.state.shown ? "-slash" : "");
 			addons.push(<GenerateBtn key="generate" onGenerated={this.handleGenerate.bind(this)}/>);
 			addons.push(<Button key="show" onClick={x=>this.setState({shown: !this.state.shown})}><FA
 				icon={icon}/> {this.state.shown ? "Hide" : "Show"}</Button>);
 		}
-        addons.push(<Button key="edit" onClick={startEditingField.bind(null, this.props.recordId, this.props.fieldId)}><FA icon="cog"/> Edit</Button>);
-        addons.push(<CopyBtn key="copy" val={field.value}/>);
+		addons.push(<Button key="edit"
+							onClick={startEditingField.bind(null, this.props.recordId, this.props.fieldId)}><FA
+			icon="cog"/> Edit</Button>);
+		addons.push(<CopyBtn key="copy" val={field.value}/>);
 
-        return (
-            <Input ref="input"
+		return (
+			<Input ref="input"
 				   type={type}
 				   label={field.name}
 				   value={field.value}
-                   onChange={this.handleChange.bind(this)}
+				   onChange={this.handleChange.bind(this)}
 				   buttonAfter={addons}
 			/>
-        );
-    }
+		);
+	}
 }
 
 export class RecordEditor extends React.Component {
-	get fields(){
+	get fields() {
 		let record = this.props.record;
 
 		var fields = [];
 
-		for(var [key, field] of record.fields){
+		for (var [key, field] of record.fields) {
 			var type = TextField;
 			var props = {
 				field: field,
@@ -110,7 +113,7 @@ export class RecordEditor extends React.Component {
 				fieldId: key
 			};
 
-			switch(field.type){
+			switch (field.type) {
 				case FieldType.text:
 					props.type = "text";
 					break;
@@ -131,11 +134,12 @@ export class RecordEditor extends React.Component {
 		return fields;
 	}
 
-	render(){
+	render() {
 		let record = this.props.record;
 		let id = this.props.id;
 
-		let fieldTypes = Object.keys(FieldType).map(x=>FieldType[x]).map(t => <MenuItem eventKey={t} key={t} onSelect={addField.bind(null, id, t)}>{capitalizeFirstLetter(t)}</MenuItem>)
+		let fieldTypes = Object.keys(FieldType).map(x=>FieldType[x]).map(t => <MenuItem eventKey={t} key={t}
+																						onSelect={addField.bind(null, id, t)}>{capitalizeFirstLetter(t)}</MenuItem>)
 
 		return (
 			<div className="panel panel-default">
