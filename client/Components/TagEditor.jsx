@@ -5,7 +5,7 @@ import PureComponent from 'react-pure-render/component';
 import {EditingType} from './../DataTypes/index.es6';
 import {setTag, doneEditingTag} from './../GlobalState.es6';
 
-import { Input, ButtonInput } from 'react-bootstrap';
+import { Input, ButtonInput, Panel } from 'react-bootstrap';
 
 export class TagEditor extends React.Component {
 	handleChange(){
@@ -27,15 +27,19 @@ export class TagEditor extends React.Component {
 			style = "warning";
 		}
 
-		return <Input
-			ref="name"
-			type="text"
-			label={label}
-			bsStyle={style}
-			value={name}
-			placeholder="Tag name"
-			hasFeedback
-			onChange={this.handleChange.bind(this)}
-		/>
+		return (
+			<Panel header="Edit tag">
+				<Input
+					ref="name"
+					type="text"
+					label={label}
+					bsStyle={style}
+					value={name}
+					placeholder="Tag name"
+					hasFeedback
+					onChange={this.handleChange.bind(this)}
+				/>
+			</Panel>
+		)
 	}
 }

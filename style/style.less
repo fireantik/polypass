@@ -44,9 +44,24 @@ html, body, #app, #appContainer, #appContainer > div {
 
 	  &#record-tab {
 		display: block;
+
+		&.active {
+		  width: 100%;
+		}
 	  }
 	}
   }
+}
+
+.navbar .container {
+  width: 100%;
+}
+
+#record-tab .panel {
+  border-radius: 0;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
 }
 
 #navbar_showtype {
@@ -81,6 +96,10 @@ html, body, #app, #appContainer, #appContainer > div {
   border-bottom: @border;
   display: flex;
   padding: 0;
+
+  &:first-child {
+	border-top: @border;
+  }
 }
 
 .custom-list-group-item button {
