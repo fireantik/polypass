@@ -3,23 +3,9 @@
 import React from 'react';
 import Immutable from 'immutable';
 //import {Modal, Button, Input, ButtonInput} from 'react-bootstrap';
-import {Button, Input, ButtonInput} from 'react-bootstrap';
+import {Button, Input, ButtonInput, Panel} from 'react-bootstrap';
+import {passwordGenerated} from '../GlobalState.es6';
 import Crypto from './../../common/Crypto.js';
-import Modal from 'react-modal';
-
-
-const customStyles = {
-	content: {
-		top: '50%',
-		left: '50%',
-		right: 'auto',
-		bottom: 'auto',
-		marginRight: '-50%',
-		transform: 'translate(-50%, -50%)',
-		width: '600px',
-		height: '90%'
-	}
-};
 
 
 export class PasswordGenerator extends React.Component {
@@ -54,8 +40,7 @@ export class PasswordGenerator extends React.Component {
 
 	generate(e) {
 		e.preventDefault();
-		this.props.onValue(this.recalculate(false));
-		this.setState({visible: false});
+		passwordGenerated(this.props.recordId, this.props.fieldId, this.recalculate(false));
 	}
 
 	static generateKey(keySpace, len) {
@@ -130,17 +115,16 @@ export class PasswordGenerator extends React.Component {
 		}
 
 		return (
-			<Modal style={customStyles} isOpen={this.props.visible} onRequestClose={this.props.onClose}>
+			<Panel header="Generate password">
 				<form onSubmit={this.generate.bind(this)}>
-					<h1>Password generator</h1>
 					<h4>Key space</h4>
 					{checkBoxes}
 					<Input ref="len" type="number" label="Length" defaultValue="16"
 						   onChange={this.recalculate.bind(this, true)}/>
 					{sample}
-					<ButtonInput type="submit" value="Generate"/>
+					<ButtonInput type="submit" bsStyle="success" value="Generate"/>
 				</form>
-			</Modal>
+			</Panel>
 		);
 	}
 }

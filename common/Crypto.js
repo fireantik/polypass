@@ -1,12 +1,12 @@
-var crypto = require('crypto');
-
 "use strict";
+
+var crypto = require('crypto');
 
 var ivLen = 12;
 var tagLen = 16;
 var saltLen = 8;
 var pbkdf2Len = 32;
-var pbkdf2Iters = 10 * 1000;
+var pbkdf2Iters = 1000;
 var quickHashLen = 32;
 
 function randomBuffer(len) {

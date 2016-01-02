@@ -23,7 +23,9 @@ export function setState(newState) {
 	state = newState;
 	emitter.emit("new state", state);
 
-	if (doUpdateUrl) setTimeout(updateUrl, 1);
+	if (doUpdateUrl) {
+		setTimeout(updateUrl, 1);
+	}
 }
 
 export function setInitialState() {
@@ -172,11 +174,11 @@ export function api_register(password) {
 }
 
 export function setCurrentTag(tagId) {
-	changeMainState({currentTag: tagId});
+	changeMainState({currentTag: tagId, showType: ShowType.records});
 }
 
 export function setCurrentRecord(recordId) {
-	changeMainState({currentRecord: recordId, editingType: EditingType.record});
+	changeMainState({currentRecord: recordId, editingType: EditingType.record, showType: ShowType.editor});
 }
 
 export function changeField(recordId, fieldId, field) {
@@ -216,11 +218,11 @@ export function addRecordTag(recordId, tagName) {
 }
 
 export function startEditingTag(tagId) {
-	changeMainState({currentTag: tagId, currentRecord: null, editingType: EditingType.tag});
+	changeMainState({currentTag: tagId, currentRecord: null, editingType: EditingType.tag, showType: ShowType.editor});
 }
 
 export function doneEditingTag() {
-	changeMainState({editingType: EditingType.record});
+	changeMainState({editingType: EditingType.record, showType: ShowType.tags});
 }
 
 export function setTag(tagId, tag) {
@@ -390,9 +392,9 @@ function urlHashChanged(hashMap) {
 			type = hashMap.type;
 		}
 		else if (state.data.records.get(record).fields.has(hashMap.field)) {
-			field = hashMap.fields;
+			field = hashMap.field;
 
-			if (hashMap.type == EditingType.field) {
+			if (hashMap.type == EditingType.field || hashMap.type == EditingType.fieldGen) {
 				type = hashMap.type;
 			}
 		}
@@ -422,4 +424,10 @@ function urlHashChanged(hashMap) {
 
 export function updateUrl() {
 	window.location.hash = state.state.urlHash;
+}
+
+export function passwordGenerated(recordId, fieldId, password){
+	let st = state.setIn(['data','records', recordId, 'fields', fieldId, 'value'], password);
+	setState(st);
+ 	changeMainState({editingType: EditingType.record, currentField: null, currentRecord: recordId});
 }

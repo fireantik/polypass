@@ -39,8 +39,14 @@ export class RecordSelector extends PureComponent {
 
 		let records = activeRecords
 			.sortBy(val => val.name.toLowerCase())
-			.map((record, key) => <RecordSelectorItem active={this.props.currentRecord == key} key={key} id={key}
-													  record={record}/>)
+			.map((record, key) =>
+				<RecordSelectorItem
+					active={this.props.currentRecord == key}
+					key={key}
+					id={key}
+					record={record}
+				/>
+			)
 			.toArray();
 
 		return (

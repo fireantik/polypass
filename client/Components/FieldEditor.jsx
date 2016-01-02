@@ -36,7 +36,6 @@ export class FieldEditor extends React.Component {
 		let field = this.props.field;
 		let types = Object.keys(FieldType).map(x=>FieldType[x]).map(t => <option key={t}
 																				 value={t}>{capitalizeFirstLetter(t)}</option>)
-
 		return (
 			<Panel header="Edit field">
 				<form onSubmit={this.handleSubmit.bind(this)} onReset={this.handleReset.bind(this)}>

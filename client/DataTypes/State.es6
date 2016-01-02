@@ -12,7 +12,8 @@ export const EditingType = Object.freeze({
 	record: "RECORD",
 	recordStructure: "RECORD_STRUCTURE",
 	tag: "TAG",
-	field: "FIELD"
+	field: "FIELD",
+	fieldGen: "FIELD_GENERATOR"
 });
 
 /**
@@ -69,6 +70,14 @@ export class State extends MakeClass({
 		}
 
 		return str;
+	}
+
+	pwEditHash(field){
+		return this.Set({currentField: field, editingType: EditingType.fieldGen}).urlHash;
+	}
+
+	fieldEditHash(field){
+		return this.Set({currentField: field, editingType: EditingType.field}).urlHash;
 	}
 
 	makeShowLink(type) {

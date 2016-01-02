@@ -20,7 +20,7 @@ class CopyBtn extends React.Component {
 		return (
 			<CopyToClipboard text={this.props.val}>
 				<Button bsStyle="info">
-					<FA icon="files-o"/> Copy
+					<FA icon="files-o"/><XSH> Copy</XSH>
 				</Button>
 			</CopyToClipboard>
 		);
@@ -29,23 +29,18 @@ class CopyBtn extends React.Component {
 
 
 class GenerateBtn extends React.Component {
-	constructor(props) {
-		super(props);
-		this.state = {generating: false};
-	}
-
-	onValue(x) {
-		this.setState({generating: false});
-		this.props.onGenerated(x);
-	}
-
 	render() {
-		var pwgen = <PasswordGenerator visible={this.state.generating} onClose={_=>this.setState({generating: false})}
-									   onValue={this.onValue.bind(this)}/>;
-
 		return (
-			<Button onClick={_=>this.setState({generating: true})}><FA icon="magic"/> Generate{pwgen}</Button>
+			<Button href={this.props.state.pwEditHash(this.props.fieldId)}>
+				<FA icon="magic"/><XSH> Generate</XSH>
+			</Button>
 		);
+	}
+}
+
+class XSH extends React.Component {
+	render(){
+		return <span className="hidden-xs">{this.props.children}</span>
 	}
 }
 
@@ -53,11 +48,6 @@ class TextField extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {shown: false};
-	}
-
-	handleGenerate(x) {
-		let field = this.props.field.set('value', x);
-		this.props.onChange(field);
 	}
 
 	handleChange() {
@@ -76,13 +66,18 @@ class TextField extends React.Component {
 		if (this.props.type == "password") {
 			type = this.state.shown ? "text" : "password"
 			var icon = "eye" + (this.state.shown ? "-slash" : "");
-			addons.push(<GenerateBtn key="generate" onGenerated={this.handleGenerate.bind(this)}/>);
-			addons.push(<Button key="show" onClick={x=>this.setState({shown: !this.state.shown})}><FA
-				icon={icon}/> {this.state.shown ? "Hide" : "Show"}</Button>);
+			addons.push(<GenerateBtn key="generate" state={this.props.state} fieldId={this.props.fieldId}/>);
+			addons.push(
+				<Button key="show" onClick={x=>this.setState({shown: !this.state.shown})}>
+					<FA icon={icon}/><XSH> {this.state.shown ? "Hide" : "Show"}</XSH>
+				</Button>
+			);
 		}
-		addons.push(<Button key="edit"
-							onClick={startEditingField.bind(null, this.props.recordId, this.props.fieldId)}><FA
-			icon="cog"/> Edit</Button>);
+		addons.push(
+			<Button key="edit" href={this.props.state.fieldEditHash(this.props.fieldId)}>
+				<FA icon="cog"/><XSH> Edit</XSH>
+			</Button>
+		);
 		addons.push(<CopyBtn key="copy" val={field.value}/>);
 
 		return (
@@ -110,7 +105,8 @@ export class RecordEditor extends React.Component {
 				key: key,
 				onChange: changeField.bind(null, this.props.id, key),
 				recordId: this.props.id,
-				fieldId: key
+				fieldId: key,
+				state: this.props.state
 			};
 
 			switch (field.type) {
@@ -138,8 +134,13 @@ export class RecordEditor extends React.Component {
 		let record = this.props.record;
 		let id = this.props.id;
 
-		let fieldTypes = Object.keys(FieldType).map(x=>FieldType[x]).map(t => <MenuItem eventKey={t} key={t}
-																						onSelect={addField.bind(null, id, t)}>{capitalizeFirstLetter(t)}</MenuItem>)
+		let fieldTypes = Object.keys(FieldType)
+			.map(x=>FieldType[x])
+			.map(t =>
+				<MenuItem eventKey={t} key={t} onSelect={addField.bind(null, id, t)}>
+					{capitalizeFirstLetter(t)}
+				</MenuItem>
+			);
 
 		return (
 			<div className="panel panel-default">
@@ -155,11 +156,11 @@ export class RecordEditor extends React.Component {
 					{this.fields}
 
 					<ButtonGroup>
-						<Button onClick={startEditingRecord.bind(null, id)}><FA icon="cog"/> Edit record</Button>
+						<Button bsStyle="danger" onClick={deleteRecord.bind(null, id)}><FA icon="trash"/> Delete record</Button>
 						<DropdownButton title="Add field" id="addNewField">
 							{fieldTypes}
 						</DropdownButton>
-						<Button bsStyle="danger" onClick={deleteRecord.bind(null, id)}><FA icon="trash"/> Delete record</Button>
+						<Button onClick={startEditingRecord.bind(null, id)}><FA icon="cog"/> Edit record</Button>
 					</ButtonGroup>
 				</div>
 			</div>
