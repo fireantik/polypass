@@ -12,7 +12,8 @@ export const FieldType = Object.freeze({
 	text: "TEXT",
 	password: "PASSWORD",
 	email: "EMAIL",
-	url: "URL"
+	url: "URL",
+	file: "FILE"
 });
 
 /**
@@ -21,7 +22,7 @@ export const FieldType = Object.freeze({
  *
  * @property {Number} lastChange
  * @property {String} name
- * @property {String} text
+ * @property {*} value
  * @property {FieldType} type
  */
 export class Field extends MakeClass({
@@ -63,6 +64,41 @@ export class Field extends MakeClass({
 			x.value = data.value;
 		}
 
+		if (data.type == FieldType.file) {
+			x.value = FileField.fromJS(data.value);
+		}
+
 		return new Field(x);
 	}
 }
+
+/**
+ * @class FileField
+ * @this FileField
+ *
+ * @property {Number} lastChange
+ * @property {String} fileName
+ * @property {Number} fileSize
+ * @property {Number} block
+ * @property {Boolean} uploaded
+ */
+export class FileField extends MakeClass({
+	fileName: "",
+	fileSize: 0,
+	blockId: -1,
+	uploaded: false
+}) {
+	constructor(props) {
+		super(props);
+	}
+
+	/**
+	 * @param {Object} [data]
+	 * @return {FileField}
+	 */
+	static fromJS(data) {
+		if(typeof data == "object") return new FileField(data);
+		else return new FileField();
+	}
+}
+

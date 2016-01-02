@@ -15,11 +15,14 @@ import {MakeClass} from './Helpers.es6';
  * @property {State} state
  * @property {MasterStateData} data
  * @property {Boolean} test
+ * @property {Api} api
+ * @property {Object.<number, Block>} blocks`
  */
 export class MasterState extends MakeClass({
 	state: new State(),
 	data: new MasterStateData(),
 	api: new Api(),
-	test: false
+	test: false,
+	blocks: Immutable.Map()
 }) {
 }

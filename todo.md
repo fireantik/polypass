@@ -2,8 +2,7 @@
 + undo delete field
 + text blocks
 + key pair record type
-
-+ responsive ui / ui rework
++ tags element of record more mobile friendly
 
 + localstorage block cache
 + history username storage

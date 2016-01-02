@@ -5,7 +5,7 @@ import Immutable from 'immutable';
 import Crypto from './../../common/Crypto.js';
 import {Panel, Input, Button, ButtonInput, ButtonGroup, DropdownButton, MenuItem} from 'react-bootstrap';
 import {PasswordGenerator} from './PasswordGenerator.jsx';
-import {changeField, deleteRecord, setRecordTags, setTags, addRecordTag, startEditingField, startEditingRecord, addField} from './../GlobalState.es6';
+import {changeField, deleteRecord, setRecordTags, setTags, addRecordTag, startEditingField, startEditingRecord, addField, fileFieldSet, downloadFile} from './../GlobalState.es6';
 import CopyToClipboard from 'react-copy-to-clipboard';
 import {RecordTagSector} from './RecordTagComponent.jsx';
 import {FieldType} from '../DataTypes/index.es6';
@@ -92,6 +92,42 @@ class TextField extends React.Component {
 	}
 }
 
+class FileField extends React.Component {
+	handleChange(e){
+		fileFieldSet(this.props.recordId, this.props.fieldId, e.target.files[0]);
+	}
+
+	render(){
+		let field = this.props.field;
+		var addons = [];
+
+		addons.push(
+			<Button key="browse" className="btn-file">
+				<FA icon="folder-open"/><XSH> Browse</XSH> <input type="file" onChange={this.handleChange.bind(this)}/>
+			</Button>
+		);
+		addons.push(
+			<Button key="edit" href={this.props.state.fieldEditHash(this.props.fieldId)}>
+				<FA icon="cog"/><XSH> Edit</XSH>
+			</Button>
+		);
+		addons.push(
+			<Button key="download" bsStyle="info" onClick={downloadFile.bind(null, this.props.recordId, this.props.fieldId)}>
+				<FA icon="download"/><XSH> Download</XSH>
+			</Button>
+		);
+
+		return (
+			<Input type="text"
+				   label={field.name + (field.value.size && !field.value.uploaded ? " (Uploading...)" : "")}
+				   value={field.value.fileName}
+				   buttonAfter={addons}
+				   disabled
+			/>
+		);
+	}
+}
+
 export class RecordEditor extends React.Component {
 	get fields() {
 		let record = this.props.record;
@@ -121,6 +157,9 @@ export class RecordEditor extends React.Component {
 					break;
 				case FieldType.url:
 					props.type = "text";
+					break;
+				case FieldType.file:
+					type = FileField;
 					break;
 			}
 
