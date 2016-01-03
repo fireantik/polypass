@@ -1,7 +1,10 @@
 "use strict";
 
 var Sequelize = require('sequelize');
-var sequelize = new Sequelize('sqlite://db.sqlite');
+
+let dbUrl = process.env.POSTGRESQL || 'sqlite://db.sqlite';
+
+var sequelize = new Sequelize(dbUrl);
 var Crypto = require('./../common/Crypto.js');
 
 var maxBlockSize = 25 * 1024 * 1024;
