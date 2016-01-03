@@ -3,12 +3,13 @@
 import React from 'react';
 import Immutable from 'immutable';
 //import {Modal, Button, Input, ButtonInput} from 'react-bootstrap';
-import {Button, Input, ButtonInput, Panel} from 'react-bootstrap';
+import {Button, Input, Panel, ButtonGroup} from 'react-bootstrap';
 import {passwordGenerated} from '../GlobalState.es6';
 import Crypto from './../../common/Crypto.js';
+import PureComponent from 'react-pure-render/component';
 
 
-export class PasswordGenerator extends React.Component {
+export class PasswordGenerator extends PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -122,7 +123,10 @@ export class PasswordGenerator extends React.Component {
 					<Input ref="len" type="number" label="Length" defaultValue="16"
 						   onChange={this.recalculate.bind(this, true)}/>
 					{sample}
-					<ButtonInput type="submit" bsStyle="success" value="Generate"/>
+					<ButtonGroup>
+						<Button type="reset" href={this.props.state.recordHash}>Cancel</Button>
+						<Button type="submit" bsStyle="success">Generate</Button>
+					</ButtonGroup>
 				</form>
 			</Panel>
 		);

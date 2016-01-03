@@ -6,8 +6,9 @@ import Crypto from './../../common/Crypto.js';
 import {Panel, Input, Button, ButtonInput, ButtonGroup} from 'react-bootstrap';
 import {setRecordTags, setTags, addRecordTag} from './../GlobalState.es6';
 import FA from './FontAwesome.jsx';
+import PureComponent from 'react-pure-render/component';
 
-class TagLabel extends React.Component {
+class TagLabel extends PureComponent {
 	render() {
 		return (
 			<span className="label label-default tag-label">
@@ -20,7 +21,7 @@ class TagLabel extends React.Component {
 	}
 }
 
-class AddTagForm extends React.Component {
+class AddTagForm extends PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -67,7 +68,7 @@ class AddTagForm extends React.Component {
 	}
 }
 
-export class RecordTagSector extends React.Component {
+export class RecordTagSector extends PureComponent {
 	removeTag(tagId) {
 		let tags = Immutable.Set(this.props.recordTags).delete(tagId);
 

@@ -10,12 +10,13 @@ import CopyToClipboard from 'react-copy-to-clipboard';
 import {RecordTagSector} from './RecordTagComponent.jsx';
 import {FieldType} from '../DataTypes/index.es6';
 import FA from './FontAwesome.jsx';
+import PureComponent from 'react-pure-render/component';
 
 function capitalizeFirstLetter(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
 
-class CopyBtn extends React.Component {
+class CopyBtn extends PureComponent {
 	render() {
 		return (
 			<CopyToClipboard text={this.props.val}>
@@ -28,7 +29,7 @@ class CopyBtn extends React.Component {
 }
 
 
-class GenerateBtn extends React.Component {
+class GenerateBtn extends PureComponent {
 	render() {
 		return (
 			<Button href={this.props.state.pwEditHash(this.props.fieldId)}>
@@ -38,13 +39,13 @@ class GenerateBtn extends React.Component {
 	}
 }
 
-class XSH extends React.Component {
+class XSH extends PureComponent {
 	render(){
 		return <span className="hidden-xs">{this.props.children}</span>
 	}
 }
 
-class TextField extends React.Component {
+class TextField extends PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {shown: false};
@@ -92,7 +93,7 @@ class TextField extends React.Component {
 	}
 }
 
-class FileField extends React.Component {
+class FileField extends PureComponent {
 	handleChange(e){
 		fileFieldSet(this.props.recordId, this.props.fieldId, e.target.files[0]);
 	}
@@ -128,7 +129,7 @@ class FileField extends React.Component {
 	}
 }
 
-export class RecordEditor extends React.Component {
+export class RecordEditor extends PureComponent {
 	get fields() {
 		let record = this.props.record;
 

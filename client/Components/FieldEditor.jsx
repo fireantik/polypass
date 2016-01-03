@@ -1,15 +1,16 @@
 "use strict";
 
 import React from 'react';
-import {Panel, Input, ButtonGroup, Button} from 'react-bootstrap';
+import {Panel, Input, ButtonGroup, Button, Row} from 'react-bootstrap';
 import {doneEditingField, changeField, deleteField} from '../GlobalState.es6';
 import {FieldType} from '../DataTypes/index.es6';
+import PureComponent from 'react-pure-render/component';
 
 function capitalizeFirstLetter(string) {
 	return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
 }
 
-export class FieldEditor extends React.Component {
+export class FieldEditor extends PureComponent {
 	handleSubmit(e) {
 		e.preventDefault();
 
@@ -44,8 +45,12 @@ export class FieldEditor extends React.Component {
 					<Input ref="type" type="select" label="Type" defaultValue={field.type}>
 						{types}
 					</Input>
+
+					<Button bsStyle="danger" onClick={this.handleDelete.bind(this)}>Delete field</Button>
+
+					<br/><br/>
+
 					<ButtonGroup>
-						<Button bsStyle="danger" onClick={this.handleDelete.bind(this)}>Delete field</Button>
 						<Button type="reset">Cancel</Button>
 						<Button type="submit" bsStyle="success">Save</Button>
 					</ButtonGroup>

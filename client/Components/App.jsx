@@ -2,9 +2,7 @@
 
 import React from 'react';
 import {Main} from './Main.jsx';
-import {UsernameSelector} from './UsernameSelector.jsx';
-import {RegisterForm, LoginForm} from './PasswordSelector.jsx';
-import {ShouldRegisterForm} from './ShouldRegisterForm.jsx';
+import {RegisterForm, LoginForm, UsernameSelector, ShouldRegisterForm} from './LoginRegister.jsx';
 import PureComponent from 'react-pure-render/component';
 import {ApiState} from './../DataTypes/index.es6';
 

@@ -379,7 +379,7 @@ function urlHashChanged(hashMap) {
 	var tag = null;
 	var field = null;
 	var type = EditingType.record;
-	var showType = ShowType.editor;
+	var showType = ShowType.records;
 
 	if (state.data.tags.has(hashMap.tag)) {
 		tag = hashMap.tag;

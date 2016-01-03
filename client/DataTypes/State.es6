@@ -72,6 +72,10 @@ export class State extends MakeClass({
 		return str;
 	}
 
+	get recordHash(){
+		return this.Set({currentField: null, editingType: EditingType.record}).urlHash;
+	}
+
 	pwEditHash(field){
 		return this.Set({currentField: field, editingType: EditingType.fieldGen}).urlHash;
 	}

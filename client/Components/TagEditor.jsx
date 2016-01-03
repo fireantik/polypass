@@ -7,7 +7,7 @@ import {setTag, doneEditingTag} from './../GlobalState.es6';
 
 import { Input, ButtonInput, Panel } from 'react-bootstrap';
 
-export class TagEditor extends React.Component {
+export class TagEditor extends PureComponent {
 	handleChange() {
 		let tag = this.props.tag.Set({
 			name: this.refs.name.getValue()

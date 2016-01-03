@@ -42,7 +42,7 @@ export class Header extends PureComponent {
 				</Navbar.Header>
 				<Navbar.Collapse>
 					<Nav>
-						<NavDropdown eventKey={10} title="New record">
+						<NavDropdown eventKey={10} title="New record" id="navDropdown">
 							<MenuItem eventKey={10.1} onSelect={createNewRecord.bind(null, NewRecordType.simple)}>Simple</MenuItem>
 							<MenuItem eventKey={10.2} onSelect={createNewRecord.bind(null, NewRecordType.web_email)}>Website (email)</MenuItem>
 							<MenuItem eventKey={10.3} onSelect={createNewRecord.bind(null, NewRecordType.web_username)}>Website (username)</MenuItem>
@@ -103,6 +103,7 @@ export class Main extends PureComponent {
 		return <PasswordGenerator
 			fieldId={fieldId}
 			recordId={recordId}
+			state={this.props.state}
 		/>
 	}
 

@@ -3,8 +3,9 @@
 import React from 'react';
 import {Panel, Input, ButtonGroup, Button} from 'react-bootstrap';
 import {doneEditingRecord, setRecord} from '../GlobalState.es6';
+import PureComponent from 'react-pure-render/component';
 
-export class RecordStructureEditor extends React.Component {
+export class RecordStructureEditor extends PureComponent {
 	handleSubmit(e) {
 		e.preventDefault();
 
