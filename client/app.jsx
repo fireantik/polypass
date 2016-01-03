@@ -6,6 +6,7 @@ import {App} from './Components/App.jsx';
 import {emitter, setInitialState, setTestState, urlChanged} from './GlobalState.es6';
 import 'bootstrap/less/bootstrap.less';
 import '../style/style.less';
+require('offline-plugin/runtime').install();
 
 emitter.on('new state', function (state) {
 	ReactDOM.render(
