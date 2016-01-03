@@ -10,7 +10,7 @@ var jwt = require('jsonwebtoken');
 var getRawBody = require('raw-body');
 var Crypto = require(__dirname + '/../common/Crypto.js');
 var fs = require('fs');
-var compression = require('compression')
+var compression = require('compression');
 var compiler = require('./compiler.js');
 if (!production) compiler.watch();
 else compiler.readOnly();

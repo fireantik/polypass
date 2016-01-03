@@ -1,7 +1,7 @@
 'use strict';
 var Block = require('./Block.js');
 var Crypto = require('./../common/Crypto.js');
-var request = require('superagent')
+var request = require('superagent');
 var jwt = require('jsonwebtoken');
 var NodeRSA = require('node-rsa');
 var streamBuffers = require('stream-buffers');

@@ -2,10 +2,11 @@
 
 var Sequelize = require('sequelize');
 
-let dbUrl = process.env.POSTGRESQL || 'sqlite://db.sqlite';
+var dbUrl = process.env.POSTGRESQL || 'sqlite://db.sqlite';
 
 var sequelize = new Sequelize(dbUrl);
 var Crypto = require('./../common/Crypto.js');
+var production = process.env.NODE_ENV == "prod" || process.env.NODE_ENV == "production";
 
 var maxBlockSize = 25 * 1024 * 1024;
 
@@ -28,7 +29,7 @@ var Block = module.exports.Block = sequelize.define('Block', {
 
 User.hasMany(Block, {foreignKey: 'uid'});
 
-module.exports.ready = sequelize.sync({force: true}).then(function () {
+module.exports.ready = sequelize.sync({force: !production}).then(function () {
 	console.log("db synced");
 });
 
