@@ -132,7 +132,6 @@ export class Main extends PureComponent {
 
 		let editorClasses = "col-md-7 col-sm-8" + (state.showType == ShowType.editor ? " active" : "");
 
-		console.log("Main render");
 		return (
 			<div id="app" className="container-fluid">
 				<Header state={state}/>
