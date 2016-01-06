@@ -1,6 +1,5 @@
 var webpack = require("webpack");
 var path = require('path');
-var OfflinePlugin = require('offline-plugin');
 
 var production = process.env.NODE_ENV == "prod" || process.env.NODE_ENV == "production";
 
@@ -62,7 +61,4 @@ if (production) {
 		}
 	}));
 	module.exports.plugins.push(new webpack.optimize.DedupePlugin());
-	module.exports.plugins.push(new OfflinePlugin({
-		updateStrategy: 'changed'
-	}));
 }

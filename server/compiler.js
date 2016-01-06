@@ -8,9 +8,16 @@ var path = require('path');
 
 module.exports = {
 	files: [],
-	entries: {}
+	entries: {},
+	cacheManifest: ""
 };
 
+let manifestTemplate = fs.readFileSync(__dirname + "/appcache.mf").toString('utf-8');
+
+try {
+	fs.mkdirSync(compiler.outputPath);
+}
+catch(ex){}
 
 function readOriginal(cb) {
 	fs.readdir(compiler.outputPath, function (err, files) {
@@ -23,6 +30,13 @@ function readOriginal(cb) {
 		parseFiles(fil);
 		if (cb) cb();
 	});
+}
+
+function generateManifestFile(entries){
+	let files = Object.keys(entries)
+		.map(function(e){ return "/" + e; })
+		.join("\n");
+	module.exports.manifestFile = manifestTemplate.replace("{{files}}", files);
 }
 
 function parseFiles(filemap, removeOld) {
@@ -46,6 +60,7 @@ function parseFiles(filemap, removeOld) {
 
 	module.exports.files = filemap;
 	module.exports.entries = entries;
+	generateManifestFile(filemap);
 }
 
 function compiled(err, stats) {

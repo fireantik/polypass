@@ -1,0 +1,12 @@
+CACHE MANIFEST
+
+CACHE:
+/
+/offline
+{{files}}
+
+NETWORK:
+*
+
+FALLBACK:
+/ /offline

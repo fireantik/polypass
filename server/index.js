@@ -35,10 +35,24 @@ app.get('/', function (req, res) {
 	fs.readFile(__dirname + '/index.html', function (err, data) {
 		if (err) throw err;
 		var text = data.toString('utf-8')
-			.replace('{{preload}}', encodeURIComponent(JSON.stringify(compiler.files)))
+			.replace('{{appcache}}', 'manifest="/appcache"')
 			.replace('{{scripts}}', makeScripts(["app"]));
 		res.send(text);
 	});
+});
+
+app.get('/offline', function (req, res) {
+	fs.readFile(__dirname + '/index.html', function (err, data) {
+		if (err) throw err;
+		var text = data.toString('utf-8')
+			.replace('{{appcache}}', "")
+			.replace('{{scripts}}', makeScripts(["app"]));
+		res.send(text);
+	});
+});
+
+app.get('/appcache', function (req, res) {
+	res.send(compiler.manifestFile);
 });
 
 app.get('/info/:username', function (req, res) {
