@@ -13,6 +13,10 @@ export const ApiState = Object.freeze({
 	askLoginPassword: "LOGIN_PASSWORD",
 	passwordInvalid: "PASSWORD_INVALID",
 	working: "WORKING",
+	retrievingUsername: "RETRIEVING_USERNAME",
+	hashing: "HASHING",
+	downloadingMain: "DOWNLOADING_MAIN_BLOCK",
+	registering: "REGISTERING",
 	ready: "READY"
 });
 

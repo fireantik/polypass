@@ -84,9 +84,9 @@ export function changeApi(changes) {
 }
 
 export function api_setUsername(username) {
-	if (state.api.state != ApiState.askUsername) throw new Error("Invalid state");
+	//if (state.api.state != ApiState.askUsername) throw new Error("Invalid state");
 
-	changeApi({username: username, state: ApiState.working});
+	changeApi({username: username, state: ApiState.retrievingUsername, uid: null, salt: null, publicKey: null, privateKey: null});
 
 	getInfo(username).then(info => {
 		if (username != state.api.username) return; //username has been changed, this is no longer relevant
@@ -106,13 +106,13 @@ export function api_setUsername(username) {
 export function api_login(password) {
 	if (state.api.state != ApiState.askLoginPassword && state.api.state != ApiState.passwordInvalid) throw new Error("Invalid state");
 
-	changeApi({state: ApiState.working});
+	changeApi({state: ApiState.hashing});
 	let tmp_crypto = new Crypto(password, state.api.salt);
 	tmp_crypto.init.then(crypto => {
 		changeApi({crypto: crypto});
 		return decryptPriv(crypto, state.api.privateKey);
 	}).then(priv => {
-		changeApi({privateKey: priv});
+		changeApi({privateKey: priv, state: ApiState.downloadingMain});
 
 		var block = new Block(state.api.crypto);
 		readBlock(state.api.uid, 0, state.api.privateKey).then(data => {
@@ -157,7 +157,7 @@ function generateMasterData() {
 export function api_register(password) {
 	if (state.api.state != ApiState.askRegisterPassword) throw new Error("Invalid state");
 
-	changeApi({state: ApiState.working});
+	changeApi({state: ApiState.hashing});
 
 	let tmp_crypto = new Crypto(password);
 	tmp_crypto.init.then(crypto => {
@@ -166,7 +166,8 @@ export function api_register(password) {
 			privateKey: keys.priv,
 			publicKey: keys.pub,
 			crypto: crypto,
-			salt: crypto.salt
+			salt: crypto.salt,
+			state: ApiState.registering
 		});
 		return register(state.api.username, state.api.crypto, state.api.cert);
 	}).then(data => {
