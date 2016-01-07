@@ -149,13 +149,15 @@ export class LoginRegister extends PureComponent {
 				<Col sm={12}>
 					<br/><br/>
 					<Well>
-						<form className="form-horizontal" onSubmit={this.handleSubmit.bind(this)}>
+						<form className="form-horizontal" onSubmit={this.handleSubmit.bind(this)} autoComplete="off">
 							<Input
 								ref="username"
 								type="text"
 								label="Username"
 								labelClassName="col-sm-2"
 								wrapperClassName="col-sm-10"
+								autoCorrect="off"
+								autoCapitalize="none"
 								onChange={this.usernameChanged.bind(this)}
 							/>
 							<Input

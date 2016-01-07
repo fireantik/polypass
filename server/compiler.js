@@ -12,7 +12,7 @@ module.exports = {
 	cacheManifest: ""
 };
 
-let manifestTemplate = fs.readFileSync(__dirname + "/appcache.mf").toString('utf-8');
+let manifestTemplate = fs.readFileSync(__dirname + "/appcache.appcache").toString('utf-8');
 
 try {
 	fs.mkdirSync(compiler.outputPath);

@@ -31,22 +31,23 @@ function makeScripts(scripts) {
 	return out;
 }
 
-app.get('/', function (req, res) {
+function sendIndex(res, cache){
 	fs.readFile(__dirname + '/index.html', function (err, data) {
 		if (err) throw err;
 		var text = data.toString('utf-8')
-			.replace('{{appcache}}', 'manifest="/appcache"')
+			.replace('{{appcache}}', cache ? appcacheStr : "")
 			.replace('{{scripts}}', makeScripts(["app"]));
+
 		res.send(text);
 	});
-});
+}
 
-app.get('/offline', function (req, res) {
+app.get('/(|offline)', function (req, res) {
 	fs.readFile(__dirname + '/index.html', function (err, data) {
 		if (err) throw err;
 		var text = data.toString('utf-8')
-			.replace('{{appcache}}', "")
 			.replace('{{scripts}}', makeScripts(["app"]));
+
 		res.send(text);
 	});
 });
