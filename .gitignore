@@ -34,3 +34,5 @@ node_modules
 .idea
 db.sqlite
 dist/
+!blocks/.keep
+blocks/*
