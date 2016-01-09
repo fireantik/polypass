@@ -15,6 +15,14 @@ var compiler = require('./compiler.js');
 if (!production) compiler.watch();
 else compiler.readOnly();
 
+var checksum = require('checksum');
+var fs = require('fs');
+var path = require('path');
+var mv = require('mv');
+
+var multer  = require('multer');
+var upload = multer({ dest: require('os').tmpdir() });
+
 
 var app = express();
 
@@ -22,6 +30,7 @@ var app = express();
 app.use(compression());
 app.use(express.static(__dirname + '/../static'));
 app.use(express.static(__dirname + '/../dist', {maxAge: 1000 * 60 * 60 * 24 * 365}));
+app.use("/blocks/", express.static(__dirname + '/../blocks', {maxAge: 1000 * 60 * 60 * 24 * 365}));
 
 function makeScripts(scripts) {
 	var out = "";
@@ -29,17 +38,6 @@ function makeScripts(scripts) {
 		out += "<script src='/" + compiler.entries[script] + "'></script>\n";
 	});
 	return out;
-}
-
-function sendIndex(res, cache){
-	fs.readFile(__dirname + '/index.html', function (err, data) {
-		if (err) throw err;
-		var text = data.toString('utf-8')
-			.replace('{{appcache}}', cache ? appcacheStr : "")
-			.replace('{{scripts}}', makeScripts(["app"]));
-
-		res.send(text);
-	});
 }
 
 app.get('/(|offline)', function (req, res) {
@@ -64,10 +62,11 @@ app.get('/info/:username', function (req, res) {
 				pub: user.pub,
 				priv: user.priv,
 				uid: user.uid,
-				salt: user.salt
+				salt: user.salt,
+				mainBlock: user.mainBlock
 			});
 		}).catch(function (err) {
-		return res.status(404).end('Error ' + err.message);
+		return res.status(400).end('Error ' + err.message);
 	});
 });
 
@@ -79,7 +78,8 @@ app.post('/register', bodyParser.urlencoded({extended: true}), function (req, re
 		defaults: {
 			pub: req.body.pub,
 			priv: req.body.priv,
-			salt: req.body.salt
+			salt: req.body.salt,
+			primaryBlock: null
 		}
 	};
 
@@ -118,6 +118,7 @@ function authorize(req, res, next) {
 			if (d.expires < Date.now()) return res.status(401).end('Token expired');
 			req.jwt = d.data;
 			req.jwt.uid = d.uid;
+			req.user = user;
 			next();
 		});
 	}).catch(function (ex) {
@@ -125,37 +126,41 @@ function authorize(req, res, next) {
 	});
 }
 
-app.use('/block', function (req, res, next) {
-	getRawBody(req, {
-		limit: '25mb'
-	}).then(function (body) {
-		console.log(body);
-		console.log(body.toString('hex'));
-		req.body = body;
-		next();
-	}).catch(function (err) {
-		if (err) return res.status(500).send("Error while parsing body\n").end(err.message);
-	});
-});
+app.use('/update', authorize);
+app.post('/update', upload.array("block"), function (req, res) {
+	if(req.jwt.mainBlock) {
+		req.user.mainBlock = req.jwt.mainBlock;
+		req.user.save();
+	}
+	//return res.send("end");
 
-app.put('/block', authorize, function (req, res) {
-	if (typeof req.jwt.bid == "undefined" || typeof req.jwt.checksum == "undefined") return res.status(400).end('Missing block id or checksum');
-	var checkSum = new Buffer(req.jwt.checksum, 'hex');
-	if (!Crypto.checkSum(req.body).equals(checkSum)) return res.status(400).end('Checksum invalid');
+	if(req.jwt.blocks) {
+		var promises = req.files.map(function (block) {
+			return new Promise(function (resolve, reject) {
+				if(req.jwt.blocks.indexOf(block.originalname) == -1) return reject('Forged message detected');
 
-	db.Block.insertOrUpdate({uid: req.jwt.uid, bid: req.jwt.bid, data: req.body}).then(function (block) {
-		return res.json({success: true});
-	});
-});
+				checksum.file(block.path, {algorithm: 'sha256'}, function (err, sum) {
+					if (err) return reject('Checksum failed');
+					if (sum == block.originalname) {
+						return resolve({from: block.path, to: __dirname + "/../blocks/" + block.originalname, sum: sum});
 
-app.get('/block', authorize, function (req, res) {
-	if (typeof req.jwt.bid == "undefined") return res.status(400).end('Missing block id');
-
-	db.Block.findOne({where: {uid: req.jwt.uid, bid: req.jwt.bid}}).then(function (block) {
-		if (!block) return res.status(400).end('Block not found');
-		res.set('Content-Type', 'application/octet-stream');
-		res.send(block.data.toString('base64'));
-	});
+					}
+					else return reject('Checksum invalid');
+				});
+			})
+		});
+		Promise.all(promises).then(function (mappings) {
+			mappings.forEach(function (mapping) {
+				mv(mapping.from, mapping.to, function (err) {
+					if (err) throw err;
+					console.log("Saved block:", mapping.sum);
+				});
+			});
+			return res.send("success");
+		}).catch(function (err) {
+			return res.status(400).end(err);
+		});
+	} else return res.send("success");
 });
 
 var IP = process.env.IP || "0.0.0.0";

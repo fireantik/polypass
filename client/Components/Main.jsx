@@ -25,6 +25,7 @@ export class Main extends PureComponent {
 			id={this.props.state.currentRecord}
 			tags={this.props.data.tags}
 			state={this.props.state}
+			blocks={this.props.blocks}
 		/>;
 	}
 

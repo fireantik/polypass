@@ -32,6 +32,7 @@ export const ApiState = Object.freeze({
  * @property {?String} privateKey
  * @property {?Buffer} salt
  * @property {?Number} uid
+ * @property {?String} mainBlock
  */
 export class Api extends MakeClass({
 	username: null,
@@ -40,7 +41,8 @@ export class Api extends MakeClass({
 	publicKey: null,
 	privateKey: null,
 	salt: null,
-	uid: null
+	uid: null,
+	mainBlock: null
 }) {
 	get cert() {
 		return {pub: this.publicKey, priv: this.privateKey};

@@ -4,7 +4,7 @@ var Crypto = require('./../common/Crypto.js');
 var request = require('superagent');
 var jwt = require('jsonwebtoken');
 var NodeRSA = require('node-rsa');
-var streamBuffers = require('stream-buffers');
+var $ = require('jquery');
 
 export function genKey() {
 	var key = new NodeRSA({b: 1024});
@@ -60,118 +60,75 @@ export function register(username, crypto, keys) {
 	})
 }
 
-export function putBlock(uid, bid, block, cert) {
-	var raw;
-	return block.getRaw().then(function (r) {
-		raw = r;
-		//console.log(raw);
-		//console.log(raw.toString('hex'));
-		var checkSum = Crypto.checkSum(raw);
+export function putBlocks(uid, blocks, cert) {
+	var fd = new FormData();
 
-		return jwtSign(uid, cert, {bid: bid, checksum: checkSum.toString('hex')});
+
+	return Promise.all( blocks.map(b => {
+		return b.getRawHash()
+	}) ).then(function (rawHashes) {
+		var mainBlock = null;
+		var files = [];
+
+		rawHashes.forEach(({raw, hash}) => {
+			var file = new File([raw.buffer], hash);
+			console.log("Uploading block", hash);
+
+			fd.append('block', file);
+			files.push(hash);
+			if(!mainBlock) mainBlock = hash;
+		});
+
+		return jwtSign(uid, cert, {blocks: files, mainBlock: mainBlock});
 	}).then(function (jwt) {
 		return new Promise(function (resolve, reject) {
-			request
-				.put(location.origin + "/block")
-				.set('authorization', jwt)
-				.set('Content-Type', 'application/octet-stream')
-				.set('Content-Disposition', 'attachment; filename=data')
-				.send(raw)
-				.end(function (err, resp) {
-					if (err) return reject(err);
-					resolve(resp.body);
-				});
+			return $.ajax({
+				url: '/update',
+				data: fd,
+				processData: false,
+				contentType: false,
+				type: 'POST',
+				beforeSend: function (request)
+				{
+					request.setRequestHeader("authorization", jwt);
+				}
+			}).done(resolve).fail(reject);
 		});
 	});
 }
 
-export function readBlock(uid, bid, cert) {
-	return jwtSign(uid, cert, {bid: bid}).then(function (jwt) {
+export function readBlock(uid, hash, cert) {
+	return jwtSign(uid, cert, {hash: hash}).then(function (jwt) {
 		return new Promise(function (resolve, reject) {
-			var stream = new streamBuffers.WritableStreamBuffer();
+			var xhr = new XMLHttpRequest();
+			xhr.open("GET", "/blocks/" + hash, true);
+			xhr.responseType = "arraybuffer";
+			xhr.setRequestHeader("authentication", jwt);
 
-			request
-				.get(location.origin + "/block")
-				.set('authorization', jwt)
-				.end(function (err, resp) {
-					if (err) return reject(err);
-					stream.end();
-					resolve(new Buffer(resp.text, 'base64'));
-				})
+			xhr.onload = function(e) {
+				if(xhr.status != 200) return reject(xhr.response);
+
+				var buffer = new Buffer(xhr.response);
+				resolve(buffer);
+			};
+
+			xhr.send();
 		});
 	})
 }
 
 export function getInfo(username) {
+	let hash = Crypto.quickHash(username).toString('hex');
 	return new Promise(function (resolve, reject) {
-		request
-			.get(location.origin + "/info/" + Crypto.quickHash(username).toString('hex'))
-			.end(function (err, resp) {
-				if (err) return reject(err);
-				return resolve(resp.body);
-			})
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", "/info/" + hash, true);
+		xhr.responseType = "json";
+
+		xhr.onload = function(e) {
+			if(xhr.status != 200) return reject(xhr.response);
+			resolve(xhr.response);
+		};
+
+		xhr.send();
 	});
-}
-
-export class Api {
-	constructor(username, obj) {
-		var self = this;
-
-		this.username = username;
-
-		getInfo(username).then(function (info) {
-			if (info.error) return obj.shouldRegister();
-
-			function tryPw() {
-				return obj.getPassword().then(function (pw) {
-					return new Crypto(pw, new Buffer(info.salt, 'hex')).init;
-				}).then(function (crypto) {
-					self.crypto = crypto;
-					return decryptPriv(crypto, info.priv);
-				}).then(function (priv) {
-					//console.log(obj.initialized);
-					self.keys = {pub: info.pub, priv: priv};
-					self.uid = info.uid;
-					obj.initialized();
-				}).catch(function (err) {
-					if (err.message == "Unsupported state or unable to authenticate data") {
-						if (typeof obj.invalidPassword == "function") {
-							obj.invalidPassword();
-							return tryPw();
-						}
-					}
-					else {
-						console.log(err);
-						console.log(err.message);
-						throw err;
-					}
-				});
-			}
-
-			return tryPw();
-		}).then(function (should) {
-			if (should) {
-				return obj.getPassword().then(pw => new Crypto(pw).init).then(crypto => {
-					self.crypto = crypto;
-					self.keys = genKey();
-					return register(username, crypto, self.keys).then(data=>self.uid = data.uid).then(obj.initialized);
-				});
-			}
-		})
-	}
-
-	getBlock(id) {
-		var block = new Block(this.crypto);
-		return readBlock(this.uid, id, this.keys.priv).then(data=> {
-			block.setRaw(data);
-			return block.getLean();
-		});
-	}
-
-	writeBlock(id, data) {
-		//console.log(this.uid);
-		var block = new Block(this.crypto);
-		block.setLean(data);
-		return putBlock(this.uid, id, block, this.keys.priv);
-	}
 }

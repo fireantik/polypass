@@ -1,10 +1,11 @@
 "use strict";
 
-import {MasterState, MasterStateData, ApiState, Tag, EditingType, ShowType, State, Api, Record, Field, FieldType, FileField} from './DataTypes/index.es6';
+import {MasterState, MasterStateData, ApiState, Tag, EditingType, ShowType, State, Api, Record, Field, FieldType, FileField, BlockWrapper} from './DataTypes/index.es6';
 import EventEmitter from 'events';
-import {getInfo, decryptPriv, genKey, register, readBlock, putBlock} from './Api.es6';
+import {getInfo, decryptPriv, genKey, register, readBlock, putBlocks} from './Api.es6';
 var Block = require('./Block.js');
 var Crypto = require('./../common/Crypto.js');
+var Immutable = require('immutable');
 
 var state = null;
 var saveDataTimeout = null;
@@ -57,9 +58,27 @@ export function uploadMainBlock(data) {
 	let str = JSON.stringify(obj);
 	let block = new Block(state.api.crypto);
 	block.setLean(new Buffer(str));
-	putBlock(state.api.uid, 0, block, state.api.privateKey)
+
+	var blockDif = [block];
+	var uploadHashes = [];
+	state.blocks.filter((value, key) => !state.activeBlocks.contains(key)).forEach((b, key) => {
+		blockDif.push(b.block);
+		uploadHashes.push(key);
+	});
+
+	if(blockDif.length > 1) {
+		let st = state.set('activeBlocks', Immutable.Set(state.blocks.keySeq()));
+		setState(st);
+	}
+
+	putBlocks(state.api.uid, blockDif, state.api.privateKey)
 		.then(_ => {
 			if (data == state.data) changeMainState({unsavedChanges: false});
+			if(blockDif.length > 1){
+				var blocks = state.blocks;
+				uploadHashes.forEach(k => blocks = blocks.setIn([k, 'uploaded'], true));
+				setState(state.set('blocks', blocks));
+			}
 		});
 }
 
@@ -69,10 +88,6 @@ export function setData(data) {
 
 export function changeMainState(changes) {
 	setState(state.Set({state: state.state.Set(changes)}));
-}
-
-export function loadData(jsData) {
-	setData(new MasterStateData(jsData));
 }
 
 export function setApi(api) {
@@ -98,7 +113,8 @@ export function api_setUsername(username) {
 			uid: info.uid,
 			salt: new Buffer(info.salt, 'hex'),
 			publicKey: info.pub,
-			privateKey: info.priv
+			privateKey: info.priv,
+			mainBlock: info.mainBlock
 		});
 	});
 }
@@ -115,7 +131,7 @@ export function api_login(password) {
 		changeApi({privateKey: priv, state: ApiState.downloadingMain});
 
 		var block = new Block(state.api.crypto);
-		readBlock(state.api.uid, 0, state.api.privateKey).then(data => {
+		readBlock(state.api.uid, state.api.mainBlock, state.api.privateKey).then(data => {
 			block.setRaw(data);
 			return block.getLean();
 		}).then(lean => {
@@ -437,32 +453,30 @@ export function passwordGenerated(recordId, fieldId, password){
 }
 
 export function fileFieldSet(recordId, fieldId, file){
-	let blockId = state.data.maxBlockId;
-
-	let value = FileField.fromJS({
-		fileName: file.name,
-		fileSize: file.size,
-		blockId: blockId,
-		uploaded: false
-	});
-
-	let st = state
-		.setIn(['data','records', recordId, 'fields', fieldId, 'value'], value)
-		.setIn(['data','maxBlockId'], blockId + 1);
-
-	setState(st);
-
 	let reader = new FileReader();
 
 	reader.onload = function(e) {
 		let lean = new Buffer(reader.result);
 		let block = new Block(state.api.crypto);
 		block.setLean(lean);
-		putBlock(state.api.uid, blockId, block, state.api.privateKey)
-			.then(_ => {
-				let stt = state.setIn(['data','records', recordId, 'fields', fieldId, 'value', 'uploaded'], true);
-				setState(stt);
+		block.getRawHash().then(({raw, hash}) => {
+			let ff = FileField.fromJS({
+				fileName: file.name,
+				fileSize: file.size,
+				hash: hash
 			});
+
+			let blocks = state.blocks.set(hash, new BlockWrapper({
+				uploaded: false,
+				block: block
+			}));
+
+			let st = state
+				.setIn(['data','records', recordId, 'fields', fieldId, 'value'], ff)
+				.set('blocks', blocks);
+
+			setState(st);
+		});
 	};
 
 	reader.readAsArrayBuffer(file);
@@ -470,7 +484,8 @@ export function fileFieldSet(recordId, fieldId, file){
 
 function downloadFileBuffer(buffer, filename){
 	var element = document.createElement('a');
-	element.setAttribute('href', 'data:application/octet-stream;charset=utf-16le;base64,' + buffer.toString('base64'));
+	let file = new File([buffer.buffer], filename);
+	element.setAttribute('href', URL.createObjectURL(file));
 	element.setAttribute('download', filename);
 
 	element.style.display = 'none';
@@ -482,13 +497,11 @@ function downloadFileBuffer(buffer, filename){
 }
 
 export function downloadFile(recordId, fieldId){
-	console.log({recordId, fieldId});
 	let field = state.data.records.get(recordId).fields.get(fieldId);
-	console.log(field.toJS());
 	if(field.value.blockId <= 0) return;
 
 	var block = new Block(state.api.crypto);
-	readBlock(state.api.uid, field.value.blockId, state.api.privateKey).then(data => {
+	readBlock(state.api.uid, field.value.hash, state.api.privateKey).then(data => {
 		block.setRaw(data);
 		return block.getLean();
 	}).then(lean => {

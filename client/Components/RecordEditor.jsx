@@ -100,6 +100,7 @@ class FileField extends PureComponent {
 
 	render(){
 		let field = this.props.field;
+		let block = this.props.blocks.get(field.value.hash);
 		var addons = [];
 
 		addons.push(
@@ -120,7 +121,7 @@ class FileField extends PureComponent {
 
 		return (
 			<Input type="text"
-				   label={field.name + (field.value.size && !field.value.uploaded ? " (Uploading...)" : "")}
+				   label={field.name + (field.value.size && block && !block.uploaded ? " (Uploading...)" : "")}
 				   value={field.value.fileName}
 				   buttonAfter={addons}
 				   disabled
@@ -161,6 +162,7 @@ export class RecordEditor extends PureComponent {
 					break;
 				case FieldType.file:
 					type = FileField;
+					props.blocks = this.props.blocks;
 					break;
 			}
 

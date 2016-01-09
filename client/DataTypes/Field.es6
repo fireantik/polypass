@@ -79,14 +79,12 @@ export class Field extends MakeClass({
  * @property {Number} lastChange
  * @property {String} fileName
  * @property {Number} fileSize
- * @property {Number} block
- * @property {Boolean} uploaded
+ * @property {?String} hash
  */
 export class FileField extends MakeClass({
 	fileName: "",
 	fileSize: 0,
-	blockId: -1,
-	uploaded: false
+	hash: null
 }) {
 	constructor(props) {
 		super(props);

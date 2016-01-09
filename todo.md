@@ -1,3 +1,6 @@
++ remove jquery
++ move client crypto into webworker
+
 + undo delete record
 + undo delete field
 + text blocks

@@ -13,12 +13,10 @@ import {MakeClass} from './Helpers.es6';
  * @property {Number} lastChange
  * @property {Object.<string, Record>} records
  * @property {Object.<string, Tag>} tags
- * @property {Number} maxBlockId
  */
 export class MasterStateData extends MakeClass({
 	records: Immutable.Map(),
-	tags: Immutable.Map(),
-	maxBlockId: 1
+	tags: Immutable.Map()
 }) {
 
 	/**
@@ -31,7 +29,7 @@ export class MasterStateData extends MakeClass({
 			lastChange: Date.now(),
 			records: {},
 			tags: {},
-			maxBlockId: 1
+			activeBlocks: []
 		};
 
 		if (typeof data.lastChange == "number") {
@@ -48,10 +46,6 @@ export class MasterStateData extends MakeClass({
 			for (let key in data.tags) {
 				x.tags[key] = Tag.fromJS(data.tags[key]);
 			}
-		}
-
-		if (typeof data.maxBlockId == "number") {
-			x.maxBlockId = data.maxBlockId;
 		}
 
 		x.records = Immutable.Map(x.records);

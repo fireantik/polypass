@@ -7,3 +7,4 @@ export * from './Record.es6';
 export * from './State.es6';
 export * from './Tag.es6';
 export * from './Api.es6';
+export * from './BlockWrapper.es6';

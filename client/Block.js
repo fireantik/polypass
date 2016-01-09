@@ -8,7 +8,7 @@ function Block(crypto) {
 	this._tag = null;
 	this._raw = null;
 	this._lean = null;
-	this.debug = 0;
+	this.debug = Math.floor(Math.random() * 10000);
 }
 
 Block.prototype.getRaw = function () {
@@ -22,9 +22,8 @@ Block.prototype.getRaw = function () {
 	else return this._raw = Compression.compress(self._lean).then(self.crypto.encrypt.bind(self.crypto)).then(function (encrypted) {
 			self._iv = encrypted.iv;
 			self._tag = encrypted.tag;
-			self._raw = encrypted.data;
 			self.debug++;
-			return Buffer.concat([encrypted.iv, encrypted.tag, self._raw]);
+			return self._raw = Buffer.concat([encrypted.iv, encrypted.tag, encrypted.data]);
 		});
 };
 
@@ -50,17 +49,15 @@ Block.prototype.setLean = function (lean) {
 	this._tag = null;
 };
 
-Block.prototype.getInfo = function () {
+Block.prototype.getRawHash = function () {
 	var self = this;
 
 	return this.getRaw().then(function (raw) {
-		return new proto.BlockInfo({
-			id: self.id,
-			iv: self._iv,
-			tag: self._tag,
-			length: raw.length,
-			data: raw
-		});
+		return {
+			raw: raw,
+			hash: Crypto.checkSum(raw).toString('hex'),
+			debug: self.debug
+		}
 	});
 };
 
