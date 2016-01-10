@@ -40,8 +40,10 @@
     "stream-buffers": "^3.0.0",
     "style-loader": "^0.13.0",
     "superagent": "^1.4.0",
+    "urijs": "^1.17.0",
     "url-loader": "^0.5.7",
-    "webpack": "^1.12.9"
+    "webpack": "^1.12.9",
+    "worker-loader": "git+https://github.com/unizin/worker-loader.git#service-worker"
   },
   "scripts": {
     "build": "webpack --config webpack.config.js --progress --colors -p",

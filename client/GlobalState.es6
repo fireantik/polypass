@@ -59,19 +59,20 @@ export function uploadMainBlock(data) {
 	let block = new Block(state.api.crypto);
 	block.setLean(new Buffer(str));
 
-	var blockDif = [block];
-	var uploadHashes = [];
-	state.blocks.filter((value, key) => !state.activeBlocks.contains(key)).forEach((b, key) => {
-		blockDif.push(b.block);
-		uploadHashes.push(key);
-	});
+	block.getRawHash().then(({raw, hash}) => {
+		var blockDif = [block];
+		var uploadHashes = [];
+		state.blocks.filter((value, key) => !state.activeBlocks.contains(key)).forEach((b, key) => {
+			blockDif.push(b.block);
+			uploadHashes.push(key);
+		});
 
-	if(blockDif.length > 1) {
-		let st = state.set('activeBlocks', Immutable.Set(state.blocks.keySeq()));
-		setState(st);
-	}
+		if(blockDif.length > 1) {
+			let st = state.set('activeBlocks', Immutable.Set(state.blocks.keySeq()));
+			setState(st);
+		}
 
-	putBlocks(state.api.uid, blockDif, state.api.privateKey)
+		putBlocks(state.api.uid, blockDif, state.api.privateKey)
 		.then(_ => {
 			if (data == state.data) changeMainState({unsavedChanges: false});
 			if(blockDif.length > 1){
@@ -79,7 +80,22 @@ export function uploadMainBlock(data) {
 				uploadHashes.forEach(k => blocks = blocks.setIn([k, 'uploaded'], true));
 				setState(state.set('blocks', blocks));
 			}
+
+			var hashes = [hash];
+			state.data.records
+				.valueSeq()
+				.map(r =>
+					r.fields
+						.valueSeq()
+						.filter(f => f.type == FieldType.file && f.value.hash)
+						.map(f => f.value.hash)
+				)
+				.flatten()
+				.forEach(h => hashes.push(h));
+
+			emitter.emit("blocks changed", hashes);
 		});
+	})
 }
 
 export function setData(data) {
